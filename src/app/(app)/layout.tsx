@@ -1,23 +1,30 @@
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { Sidebar } from "@/components/app-shell/sidebar";
-import { TopBar } from "@/components/app-shell/top-bar";
 import { getSession } from "@/lib/auth/session";
 
-export default async function AppLayout({ children }: { children: ReactNode }) {
+export default async function AppLayout({
+  children,
+  aside,
+}: {
+  children: ReactNode;
+  aside: ReactNode;
+}) {
   const user = await getSession();
   if (!user) redirect("/login");
 
+  const hasAside = aside !== null && aside !== undefined;
+
   return (
-    <div className="flex min-h-dvh flex-1">
-      <Sidebar />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <TopBar user={user} />
-        <main className="flex-1 overflow-y-auto bg-background p-4 md:p-6">
-          {children}
-        </main>
-      </div>
+    <div className="flex min-h-dvh w-full bg-canvas">
+      <main className="flex min-w-0 flex-1 flex-col overflow-y-auto">
+        {children}
+      </main>
+      {hasAside ? (
+        <aside className="hidden w-[clamp(320px,30vw,450px)] shrink-0 flex-col overflow-y-auto border-l border-border/40 bg-[color-mix(in_oklch,var(--surface-light)_60%,transparent)] backdrop-blur-md lg:flex">
+          {aside}
+        </aside>
+      ) : null}
     </div>
   );
 }
