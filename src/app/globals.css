@@ -37,13 +37,6 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
 
   /* Brand (warm brown/gold) */
   --color-brand-gold: var(--brown-gold);
@@ -121,7 +114,6 @@
   --border: oklch(74.7% 0.061 75.1 / 35%);          /* #C4A882 brown light @ 35% */
   --input: oklch(74.7% 0.061 75.1 / 50%);           /* #C4A882 brown light @ 50% */
   --ring: oklch(66.9% 0.108 71.3);                  /* #BE8944 brand gold */
-  --radius: 1rem;
 
   /* Charts */
   --chart-1: oklch(52.2% 0.177 255.8);              /* #0066CC blue */
