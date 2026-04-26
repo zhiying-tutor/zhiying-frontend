@@ -35,7 +35,7 @@ export function CheckinButton({
       type="button"
       disabled={isPending || done}
       onClick={handleClick}
-      className={`flex h-11 items-center justify-center gap-1 rounded-[14px] border border-palette-yellow/40 bg-gradient-to-br from-palette-yellow-mist to-palette-yellow-light text-[13px] font-extrabold text-brand-dark shadow-[0_2px_8px_color-mix(in_oklch,var(--palette-yellow)_25%,transparent)] transition-transform hover:not-disabled:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 ${className ?? ""}`}
+      className={`flex h-11 items-center justify-center gap-1 rounded-[14px] border border-palette-yellow/40 bg-gradient-to-br from-palette-yellow-mist to-palette-yellow-light text-sm font-extrabold text-brand-dark shadow-[0_2px_8px_color-mix(in_oklch,var(--palette-yellow)_25%,transparent)] transition-transform hover:not-disabled:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 ${className ?? ""}`}
     >
       {done ? <><Check className="size-4" strokeWidth={2.5} /> 已签到</> : isPending ? "签到中…" : <><CalendarCheck className="size-4" strokeWidth={2.5} /> 签到</>}
     </button>

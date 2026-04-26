@@ -82,7 +82,7 @@ export function DashboardAsideClient({
           <button
             type="button"
             disabled
-            className="flex h-11 flex-1 items-center justify-center gap-1 rounded-[14px] border-[1.5px] border-palette-green-light/50 bg-gradient-to-br from-palette-green-mist to-palette-green-lighter text-[13px] font-extrabold text-brand-dark shadow-[0_4px_8px_color-mix(in_oklch,var(--color-border-muted)_15%,transparent)] transition-transform disabled:cursor-not-allowed disabled:opacity-70"
+            className="flex h-11 flex-1 items-center justify-center gap-1 rounded-[14px] border-[1.5px] border-palette-green-light/50 bg-gradient-to-br from-palette-green-mist to-palette-green-lighter text-sm font-extrabold text-brand-dark shadow-[0_4px_8px_color-mix(in_oklch,var(--color-border-muted)_15%,transparent)] transition-transform disabled:cursor-not-allowed disabled:opacity-70"
           >
             <BookOpen className="size-4" strokeWidth={2.5} /> 新手图鉴
           </button>
@@ -140,11 +140,11 @@ function StatCard({
     <div
       className={`flex items-center justify-between rounded-xl border px-3 py-2 ${TONE_CLASS[tone]}`}
     >
-      <span className="flex items-center gap-1 text-xs font-bold text-brand-dark">
+      <span className="flex items-center gap-1 text-sm font-semibold text-brand-dark">
         {icon}
         {label}
       </span>
-      <span className="text-base font-black text-brand-dark">{value}</span>
+      <span className="text-sm font-extrabold text-brand-dark">{value}</span>
     </div>
   );
 }
