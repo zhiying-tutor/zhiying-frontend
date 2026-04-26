@@ -21,7 +21,7 @@ export default async function AppLayout({
         {children}
       </main>
       {hasAside ? (
-        <aside className="hidden w-[clamp(320px,30vw,450px)] shrink-0 flex-col overflow-y-auto border-l border-border/40 bg-[color-mix(in_oklch,var(--surface-light)_60%,transparent)] backdrop-blur-md lg:flex">
+        <aside className="hidden w-[clamp(320px,30vw,450px)] shrink-0 flex-col overflow-y-auto border-l border-border/40 bg-gradient-to-b from-palette-orange-mist/60 to-canvas lg:flex">
           {aside}
         </aside>
       ) : null}

@@ -27,7 +27,7 @@ export function DashboardAsideClient({
   return (
     <div className="flex h-full flex-col">
       <div className="relative flex shrink-0 flex-col items-center border-b border-dashed border-border/30 px-6 pt-8 pb-6">
-        <div className="absolute inset-x-0 top-0 h-[100px] bg-gradient-to-br from-palette-yellow-light/30 to-palette-orange-light/30" />
+        <div className="absolute inset-x-0 top-0 h-[100px] bg-gradient-to-b from-palette-orange-light/50 to-transparent" />
 
         {needsProfile && (
           <button
