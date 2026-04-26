@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BookImage, LogOut } from "lucide-react";
+import { BookOpen, Coins, Crown, Flame, Gem, LogOut } from "lucide-react";
 
 import { logoutAction } from "@/app/(app)/dashboard/actions";
 import { CheckinButton } from "@/components/dashboard/checkin-button";
@@ -67,14 +67,15 @@ export function DashboardAsideClient({
         </p>
 
         <div className="relative z-10 mb-3 grid w-full grid-cols-2 gap-2">
-          <StatCard label="等级" value={`Lv.${level}`} tone="yellow" />
+          <StatCard label="等级" icon={<Crown className="size-3.5" />} value={`Lv.${level}`} tone="yellow" />
           <StatCard
             label="连续登录天数"
+            icon={<Flame className="size-3.5" />}
             value={`${user.streak_checkins} 天`}
             tone="orange"
           />
-          <StatCard label="🪙 金币" value={user.gold} tone="blue" />
-          <StatCard label="💎 钻石" value={user.diamond} tone="purple" />
+          <StatCard label="金币" icon={<Coins className="size-3.5" />} value={user.gold} tone="blue" />
+          <StatCard label="钻石" icon={<Gem className="size-3.5" />} value={user.diamond} tone="purple" />
         </div>
 
         <div className="relative z-10 flex w-full gap-2">
@@ -83,7 +84,7 @@ export function DashboardAsideClient({
             disabled
             className="flex h-11 flex-1 items-center justify-center gap-1 rounded-[14px] border-[1.5px] border-palette-green-light/50 bg-gradient-to-br from-palette-green-mist to-palette-green-lighter text-[13px] font-extrabold text-brand-dark shadow-[0_4px_8px_color-mix(in_oklch,var(--color-border-muted)_15%,transparent)] transition-transform disabled:cursor-not-allowed disabled:opacity-70"
           >
-            📖 新手图鉴
+            <BookOpen className="size-4" strokeWidth={2.5} /> 新手图鉴
           </button>
           <CheckinButton
             alreadyCheckedToday={checkedToday}
@@ -99,18 +100,6 @@ export function DashboardAsideClient({
             </button>
           </form>
         </div>
-      </div>
-
-      <div className="shrink-0 border-b border-dashed border-border/30 px-6 py-4 hidden">
-        <button
-          type="button"
-          disabled
-          className="flex w-full items-center gap-3 rounded-2xl bg-palette-purple-mist/60 px-4 py-3 text-left text-sm font-semibold text-brand-dark shadow-sm disabled:cursor-not-allowed disabled:opacity-70"
-        >
-          <BookImage className="size-5 text-palette-purple" />
-          <span className="flex-1">新手图鉴</span>
-          <span className="text-xs text-brand-medium">即将开放 ›</span>
-        </button>
       </div>
 
       <AiChatPanel />
@@ -138,10 +127,12 @@ const TONE_CLASS: Record<Tone, string> = {
 
 function StatCard({
   label,
+  icon,
   value,
   tone,
 }: {
   label: string;
+  icon: React.ReactNode;
   value: string | number;
   tone: Tone;
 }) {
@@ -149,7 +140,10 @@ function StatCard({
     <div
       className={`flex items-center justify-between rounded-xl border px-3 py-2 ${TONE_CLASS[tone]}`}
     >
-      <span className="text-xs font-bold text-brand-dark">{label}</span>
+      <span className="flex items-center gap-1 text-xs font-bold text-brand-dark">
+        {icon}
+        {label}
+      </span>
       <span className="text-base font-black text-brand-dark">{value}</span>
     </div>
   );
