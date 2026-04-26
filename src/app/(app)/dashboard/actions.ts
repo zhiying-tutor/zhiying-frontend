@@ -1,16 +1,22 @@
 "use server";
 
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
-import { serverFetch } from "@/lib/api/client";
+import { AUTH_COOKIE, serverFetch } from "@/lib/api/client";
 import { ApiError } from "@/lib/api/errors";
 import {
   checkinResponseSchema,
+  meProfileSchema,
   studyLanguage,
   studySubjectSchema,
+  userSchema,
   type CheckinResponse,
+  type MeProfile,
   type StudyLanguage,
   type StudySubject,
+  type User,
 } from "@/lib/api/schemas";
 
 export type CheckinActionResult =
@@ -83,5 +89,72 @@ export async function createSubjectAction(
     }
     throw err;
   }
+}
+
+// ── Profile update ──
+
+export type UpdateProfileInput = {
+  birth_year?: number | null;
+  gender?: "MALE" | "FEMALE" | null;
+  introduction?: string;
+};
+
+export type UpdateProfileActionResult =
+  | { ok: true; data: MeProfile }
+  | { ok: false; message: string };
+
+export async function updateProfileAction(
+  input: UpdateProfileInput,
+): Promise<UpdateProfileActionResult> {
+  try {
+    const data = await serverFetch<MeProfile>("/me", {
+      method: "PATCH",
+      body: input,
+      schema: meProfileSchema,
+    });
+    revalidatePath("/dashboard");
+    return { ok: true, data };
+  } catch (err) {
+    if (err instanceof ApiError) {
+      return { ok: false, message: err.message };
+    }
+    throw err;
+  }
+}
+
+// ── Username update ──
+
+export type UpdateUsernameActionResult =
+  | { ok: true; data: User }
+  | { ok: false; message: string };
+
+export async function updateUsernameAction(
+  username: string,
+): Promise<UpdateUsernameActionResult> {
+  const trimmed = username.trim();
+  if (trimmed.length < 3 || trimmed.length > 32) {
+    return { ok: false, message: "昵称需在 3–32 字符内" };
+  }
+  try {
+    const data = await serverFetch<User>("/me/username", {
+      method: "PATCH",
+      body: { username: trimmed },
+      schema: userSchema,
+    });
+    revalidatePath("/dashboard");
+    return { ok: true, data };
+  } catch (err) {
+    if (err instanceof ApiError) {
+      return { ok: false, message: err.message };
+    }
+    throw err;
+  }
+}
+
+// ── Logout ──
+
+export async function logoutAction(): Promise<void> {
+  (await cookies()).delete(AUTH_COOKIE);
+  redirect("/login");
 }
 

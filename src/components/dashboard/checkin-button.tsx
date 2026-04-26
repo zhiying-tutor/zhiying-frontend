@@ -5,7 +5,13 @@ import { toast } from "sonner";
 
 import { checkinAction } from "@/app/(app)/dashboard/actions";
 
-export function CheckinButton({ alreadyCheckedToday }: { alreadyCheckedToday: boolean }) {
+export function CheckinButton({
+  alreadyCheckedToday,
+  className,
+}: {
+  alreadyCheckedToday: boolean;
+  className?: string;
+}) {
   const [isPending, startTransition] = useTransition();
   const [done, setDone] = useState(alreadyCheckedToday);
 
@@ -28,9 +34,9 @@ export function CheckinButton({ alreadyCheckedToday }: { alreadyCheckedToday: bo
       type="button"
       disabled={isPending || done}
       onClick={handleClick}
-      className="flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-palette-yellow to-palette-orange text-sm font-bold text-brand-dark shadow-[0_4px_12px_color-mix(in_oklch,var(--palette-orange)_30%,transparent)] transition-transform hover:not-disabled:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+      className={`flex h-11 items-center justify-center gap-1 rounded-[14px] border border-palette-yellow/40 bg-gradient-to-br from-palette-yellow-mist to-palette-yellow-light text-[13px] font-extrabold text-brand-dark shadow-[0_2px_8px_color-mix(in_oklch,var(--palette-yellow)_25%,transparent)] transition-transform hover:not-disabled:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60 ${className ?? ""}`}
     >
-      {done ? "✓ 今日已签到" : isPending ? "签到中…" : "🔥 立即签到"}
+      {done ? "✓ 已签到" : isPending ? "签到中…" : "📅 签到"}
     </button>
   );
 }
