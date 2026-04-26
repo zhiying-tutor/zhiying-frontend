@@ -220,7 +220,7 @@ export function ProfileEditDialog({
           <Button
             onClick={handleSave}
             disabled={isPending || username.trim().length < 3}
-            className="h-12 w-full rounded-2xl bg-gradient-to-r from-palette-yellow to-palette-orange text-base font-bold text-brand-dark shadow-[0_4px_16px_color-mix(in_oklch,var(--palette-orange)_35%,transparent)] hover:opacity-90"
+            className="h-12 w-full bg-gradient-to-r from-palette-yellow to-palette-orange text-base font-bold text-brand-dark shadow-[0_4px_16px_color-mix(in_oklch,var(--palette-orange)_35%,transparent)] hover:opacity-90"
           >
             {isPending ? "保存中…" : "保存信息"}
           </Button>
