@@ -33,8 +33,8 @@ export const userSchema = z.object({
   exp: z.number().int(),
   gold: z.number().int(),
   diamond: z.number().int(),
-  total_checkin: z.number().int(),
-  streak_checkin: z.number().int(),
+  total_checkins: z.number().int(),
+  streak_checkins: z.number().int(),
   last_checkin: z.string().nullable(),
   last_login: z.string().nullable(),
   created_at: z.number().int(),
@@ -63,8 +63,8 @@ export const checkinResponseSchema = z.object({
   makeup_days: z.number().int(),
   diamond_cost: z.number().int(),
   gold_cost: z.number().int(),
-  total_checkin: z.number().int(),
-  streak_checkin: z.number().int(),
+  total_checkins: z.number().int(),
+  streak_checkins: z.number().int(),
 });
 export type CheckinResponse = z.infer<typeof checkinResponseSchema>;
 
@@ -98,17 +98,38 @@ export type ProblemListItem = z.infer<typeof problemListItemSchema>;
 
 // ── Study subject ──
 
+export const studyLanguage = z.enum(["PYTHON", "JAVA", "CPP", "GO", "RUST"]);
+export type StudyLanguage = z.infer<typeof studyLanguage>;
+
 export const studySubjectSchema = z.object({
   id: z.number().int(),
   subject: z.string(),
   status: studySubjectStatus,
   total_stages: z.number().int(),
   finished_stages: z.number().int(),
+  diamond_cost: z.number().int(),
+  language: z.string(),
+  target: z.string(),
   created_at: z.number().int(),
   updated_at: z.number().int(),
 });
 export const studySubjectListSchema = z.array(studySubjectSchema);
 export type StudySubject = z.infer<typeof studySubjectSchema>;
+
+// ── Public config ──
+
+export const studySubjectPricingItemSchema = z.object({
+  total_stages: z.number().int(),
+  diamond_cost: z.number().int(),
+});
+export type StudySubjectPricingItem = z.infer<typeof studySubjectPricingItemSchema>;
+
+export const publicConfigSchema = z.object({
+  study_subject: z.object({
+    pricing: z.array(studySubjectPricingItemSchema),
+  }),
+});
+export type PublicConfig = z.infer<typeof publicConfigSchema>;
 
 export const pretestProblemSchema = z.object({
   id: z.number().int(),

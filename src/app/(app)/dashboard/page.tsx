@@ -1,11 +1,16 @@
 import { Search } from "lucide-react";
+import { redirect } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
+import { CreateSubjectButton } from "@/components/dashboard/create-subject-button";
 import { serverFetch } from "@/lib/api/client";
+import { getPublicConfig } from "@/lib/api/public-config";
 import {
   studySubjectListSchema,
   type StudySubject,
+  type StudySubjectPricingItem,
 } from "@/lib/api/schemas";
+import { getSession } from "@/lib/auth/session";
 
 const STATUS_LABEL: Record<StudySubject["status"], string> = {
   PRETEST_QUEUING: "学前测排队中",
@@ -30,9 +35,16 @@ const STATUS_TONE: Record<StudySubject["status"], string> = {
 };
 
 export default async function DashboardPage() {
-  const subjects = await serverFetch<StudySubject[]>("/study-subjects", {
-    schema: studySubjectListSchema,
-  });
+  const [user, subjects, config] = await Promise.all([
+    getSession(),
+    serverFetch<StudySubject[]>("/study-subjects", {
+      schema: studySubjectListSchema,
+    }),
+    getPublicConfig(),
+  ]);
+  if (!user) redirect("/login");
+
+  const pricing = config.study_subject.pricing;
 
   return (
     <div className="flex flex-col gap-16 px-12 py-10 pb-24 lg:px-20">
@@ -60,12 +72,20 @@ export default async function DashboardPage() {
 
       <section className="mx-auto w-full max-w-[900px]">
         {subjects.length === 0 ? (
-          <EmptyState />
+          <EmptyState pricing={pricing} currentDiamond={user.diamond} />
         ) : (
           <div className="flex flex-col gap-4">
-            <h2 className="text-xl font-extrabold text-brand-dark">
-              我的学习计划
-            </h2>
+            <div className="flex items-center justify-between gap-4">
+              <h2 className="text-xl font-extrabold text-brand-dark">
+                我的学习计划
+              </h2>
+              <CreateSubjectButton
+                pricing={pricing}
+                currentDiamond={user.diamond}
+                variant="ghost"
+                label="🚀 新建计划"
+              />
+            </div>
             <ul className="flex flex-col gap-3">
               {subjects.map((s) => {
                 const progress =
@@ -111,7 +131,13 @@ export default async function DashboardPage() {
   );
 }
 
-function EmptyState() {
+function EmptyState({
+  pricing,
+  currentDiamond,
+}: {
+  pricing: StudySubjectPricingItem[];
+  currentDiamond: number;
+}) {
   return (
     <div className="mx-auto flex max-w-[680px] flex-col items-center rounded-[28px] border-2 border-dashed border-border/25 bg-white/60 px-10 py-16 text-center shadow-[var(--shadow-soft)]">
       <div className="mb-6 text-6xl drop-shadow-[0_4px_8px_color-mix(in_oklch,var(--palette-orange)_30%,transparent)]">
@@ -123,13 +149,11 @@ function EmptyState() {
       <p className="mb-8 max-w-[400px] text-[15px] leading-relaxed text-brand-medium">
         创建你的第一个个性化学习计划，AI 将为你量身定制学习路线、知识点和每日任务
       </p>
-      <button
-        type="button"
-        disabled
-        className="flex h-[52px] cursor-not-allowed items-center gap-2 rounded-full bg-gradient-to-br from-palette-yellow to-palette-orange px-9 text-base font-bold text-brand-dark opacity-70 shadow-[0_4px_16px_color-mix(in_oklch,var(--palette-orange)_35%,transparent)]"
-      >
-        <span>🚀</span> 创建第一个学习计划（即将开放）
-      </button>
+      <CreateSubjectButton
+        pricing={pricing}
+        currentDiamond={currentDiamond}
+        label="🚀 创建第一个学习计划"
+      />
     </div>
   );
 }

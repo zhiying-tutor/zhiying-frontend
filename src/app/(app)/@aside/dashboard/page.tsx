@@ -38,14 +38,14 @@ export default async function DashboardAside() {
         </h4>
         <p className="relative z-10 mb-6 text-sm font-semibold text-brand-medium">
           初学乍练 · 累计签到{" "}
-          <strong className="font-extrabold">{user.total_checkin}</strong> 天
+          <strong className="font-extrabold">{user.total_checkins}</strong> 天
         </p>
 
         <div className="relative z-10 mb-3 grid w-full grid-cols-2 gap-2">
           <StatCard label="等级" value={`Lv.${level}`} tone="yellow" />
           <StatCard
             label="连续登录"
-            value={`${user.streak_checkin} 天`}
+            value={`${user.streak_checkins} 天`}
             tone="orange"
           />
           <StatCard label="🪙 金币" value={user.gold} tone="blue" />

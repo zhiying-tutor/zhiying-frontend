@@ -15,7 +15,7 @@ export function CheckinButton({ alreadyCheckedToday }: { alreadyCheckedToday: bo
       if (result.ok) {
         setDone(true);
         toast.success(`签到成功 +${result.data.gold_reward} 金币`, {
-          description: `连续签到 ${result.data.streak_checkin} 天`,
+          description: `连续签到 ${result.data.streak_checkins} 天`,
         });
       } else {
         toast.error(result.message);
