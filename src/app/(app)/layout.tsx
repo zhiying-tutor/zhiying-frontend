@@ -16,7 +16,7 @@ export default async function AppLayout({
   const hasAside = aside !== null && aside !== undefined;
 
   return (
-    <div className="flex min-h-dvh w-full bg-canvas">
+    <div className="flex h-dvh w-full bg-canvas">
       <main className="flex min-w-0 flex-1 flex-col overflow-y-auto">
         {children}
       </main>
