@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
 import { CreateSubjectButton } from "@/components/dashboard/create-subject-button";
+import { FeatureGrid } from "@/components/dashboard/feature-grid";
 import { serverFetch } from "@/lib/api/client";
 import { getPublicConfig } from "@/lib/api/public-config";
 import {
@@ -127,6 +128,8 @@ export default async function DashboardPage() {
           </div>
         )}
       </section>
+
+      <FeatureGrid />
     </div>
   );
 }
