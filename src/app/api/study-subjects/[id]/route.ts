@@ -14,7 +14,6 @@ export async function GET(_req: Request, ctx: RouteContext<"/api/study-subjects/
   try {
     const data = await serverFetch<StudySubject>(`/study-subjects/${subjectId}`, {
       schema: studySubjectSchema,
-      cache: "no-store",
     });
     return NextResponse.json({ data });
   } catch (err) {

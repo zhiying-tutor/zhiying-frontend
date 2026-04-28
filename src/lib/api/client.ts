@@ -47,6 +47,7 @@ export async function serverFetch<T = unknown>(path: string, options: ServerFetc
   }
 
   const init: RequestInit = {
+    cache: "no-store",
     ...rest,
     headers,
     body: normalizeBody(body, headers),

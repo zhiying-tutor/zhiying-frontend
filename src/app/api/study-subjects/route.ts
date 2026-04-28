@@ -8,7 +8,6 @@ export async function GET() {
   try {
     const data = await serverFetch<StudySubject[]>("/study-subjects", {
       schema: studySubjectListSchema,
-      cache: "no-store",
     });
     return NextResponse.json({ data });
   } catch (err) {
