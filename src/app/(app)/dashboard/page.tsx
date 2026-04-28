@@ -1,9 +1,11 @@
 import { Search } from "lucide-react";
 import { redirect } from "next/navigation";
 
+import { ActiveSubjectArea } from "@/components/dashboard/active-subject-area";
 import { CreateSubjectButton } from "@/components/dashboard/create-subject-button";
 import { FeatureGrid } from "@/components/dashboard/feature-grid";
-import { SubjectList } from "@/components/dashboard/subject-list";
+import { PlanToolbar } from "@/components/dashboard/plan-toolbar";
+import { pickActiveSubject } from "@/lib/api/active-subject";
 import { serverFetch } from "@/lib/api/client";
 import { getPublicConfig } from "@/lib/api/public-config";
 import {
@@ -24,9 +26,10 @@ export default async function DashboardPage() {
   if (!user) redirect("/login");
 
   const pricing = config.study_subject.pricing;
+  const active = pickActiveSubject(user.active_study_subject_id, subjects);
 
   return (
-    <div className="flex flex-col gap-16 px-12 py-10 pb-24 lg:px-20">
+    <div className="flex flex-col gap-12 px-12 py-10 pb-24 lg:px-20">
       <header className="flex flex-col items-center text-center">
         <h1 className="mb-8 bg-gradient-to-br from-brand-dark to-palette-orange bg-clip-text text-4xl font-black tracking-tight text-transparent md:text-5xl">
           智映通学
@@ -49,24 +52,19 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      <section className="mx-auto w-full max-w-[900px]">
-        {subjects.length === 0 ? (
+      <section className="mx-auto flex w-full max-w-[900px] flex-col gap-6">
+        {active === null ? (
           <EmptyState pricing={pricing} currentDiamond={user.diamond} />
         ) : (
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between gap-4">
-              <h2 className="text-xl font-extrabold text-brand-dark">
-                我的学习计划
-              </h2>
-              <CreateSubjectButton
-                pricing={pricing}
-                currentDiamond={user.diamond}
-                variant="ghost"
-                label="🚀 新建计划"
-              />
-            </div>
-            <SubjectList initialData={subjects} />
-          </div>
+          <>
+            <PlanToolbar
+              active={active}
+              subjects={subjects}
+              pricing={pricing}
+              currentDiamond={user.diamond}
+            />
+            <ActiveSubjectArea subject={active} />
+          </>
         )}
       </section>
 

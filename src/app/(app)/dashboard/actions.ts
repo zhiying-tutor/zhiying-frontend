@@ -91,6 +91,34 @@ export async function createSubjectAction(
   }
 }
 
+// ── Active subject ──
+
+export type SetActiveSubjectActionResult =
+  | { ok: true; data: MeProfile }
+  | { ok: false; message: string };
+
+export async function setActiveSubjectAction(
+  subjectId: number,
+): Promise<SetActiveSubjectActionResult> {
+  if (!Number.isInteger(subjectId) || subjectId <= 0) {
+    return { ok: false, message: "无效的学习主题" };
+  }
+  try {
+    const data = await serverFetch<MeProfile>("/me", {
+      method: "PATCH",
+      body: { active_study_subject_id: subjectId },
+      schema: meProfileSchema,
+    });
+    revalidatePath("/dashboard");
+    return { ok: true, data };
+  } catch (err) {
+    if (err instanceof ApiError) {
+      return { ok: false, message: err.message };
+    }
+    throw err;
+  }
+}
+
 // ── Profile update ──
 
 export type UpdateProfileInput = {

@@ -37,6 +37,7 @@ export const userSchema = z.object({
   streak_checkins: z.number().int(),
   last_checkin: z.string().nullable(),
   last_login: z.string().nullable(),
+  active_study_subject_id: z.number().int().nullable(),
   created_at: z.number().int(),
   updated_at: z.number().int(),
 });
@@ -48,6 +49,7 @@ export const meProfileSchema = z.object({
   birth_year: z.number().int().nullable(),
   gender: gender.nullable(),
   introduction: z.string(),
+  active_study_subject_id: z.number().int().nullable(),
 });
 export type MeProfile = z.infer<typeof meProfileSchema>;
 
