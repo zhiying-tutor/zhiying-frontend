@@ -4,7 +4,7 @@ import { serverFetch } from "@/lib/api/client";
 import { ApiError } from "@/lib/api/errors";
 import {
   studyStageListSchema,
-  type StudyStageListItem,
+  type StudyStageDetail,
 } from "@/lib/api/schemas";
 
 export async function GET(
@@ -18,7 +18,7 @@ export async function GET(
   }
 
   try {
-    const data = await serverFetch<StudyStageListItem[]>(
+    const data = await serverFetch<StudyStageDetail[]>(
       `/study-subjects/${subjectId}/stages`,
       { schema: studyStageListSchema },
     );

@@ -155,19 +155,6 @@ export const studyTaskBriefSchema = z.object({
 });
 export type StudyTaskBrief = z.infer<typeof studyTaskBriefSchema>;
 
-export const studyStageListItemSchema = z.object({
-  id: z.number().int(),
-  title: z.string(),
-  description: z.string(),
-  sort_order: z.number().int(),
-  status: studyStageStatus,
-  total_tasks: z.number().int(),
-  finished_tasks: z.number().int(),
-  created_at: z.number().int(),
-});
-export type StudyStageListItem = z.infer<typeof studyStageListItemSchema>;
-export const studyStageListSchema = z.array(studyStageListItemSchema);
-
 export const studyStageDetailSchema = z.object({
   id: z.number().int(),
   title: z.string(),
@@ -180,6 +167,7 @@ export const studyStageDetailSchema = z.object({
   tasks: z.array(studyTaskBriefSchema),
 });
 export type StudyStageDetail = z.infer<typeof studyStageDetailSchema>;
+export const studyStageListSchema = z.array(studyStageDetailSchema);
 
 export const studyTaskSchema = z.object({
   id: z.number().int(),
