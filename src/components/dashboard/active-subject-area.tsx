@@ -4,9 +4,9 @@ import {
   FailedCard,
   FinishedCard,
   GeneratingCard,
-  JourneyV1Placeholder,
   PretestReadyCard,
 } from "@/components/dashboard/state-cards";
+import { JourneyTimeline } from "@/components/dashboard/journey-timeline";
 import { useStudySubject } from "@/lib/query/study-subject";
 import type { StudySubject } from "@/lib/api/schemas";
 
@@ -35,7 +35,7 @@ export function ActiveSubjectArea({ subject }: { subject: StudySubject }) {
         />
       );
     case "STUDYING":
-      return <JourneyV1Placeholder subject={data} />;
+      return <JourneyTimeline subject={data} />;
     case "FINISHED":
       return <FinishedCard subject={data} />;
     case "FAILED":

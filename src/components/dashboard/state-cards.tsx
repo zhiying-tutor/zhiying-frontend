@@ -106,29 +106,3 @@ export function FailedCard({ subject }: { subject: StudySubject }) {
     />
   );
 }
-
-export function JourneyV1Placeholder({ subject }: { subject: StudySubject }) {
-  const progress =
-    subject.total_stages > 0
-      ? Math.round((subject.finished_stages / subject.total_stages) * 100)
-      : 0;
-  return (
-    <Card className="flex flex-col gap-4 rounded-3xl border border-border/30 bg-white/70 p-6 shadow-[var(--shadow-soft)] backdrop-blur-sm">
-      <div className="flex items-center justify-between gap-4">
-        <h3 className="text-lg font-bold text-brand-dark">学习中</h3>
-        <span className="text-sm font-bold text-brand-medium">
-          Day {subject.finished_stages}/{subject.total_stages}
-        </span>
-      </div>
-      <div className="h-2 w-full overflow-hidden rounded-full bg-border/15">
-        <div
-          className="h-full rounded-full bg-gradient-to-r from-palette-orange to-palette-yellow transition-[width] duration-500"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-      <p className="text-sm text-brand-medium">
-        各阶段任务详情正在准备中，稍后会以时间轴的形式展现。
-      </p>
-    </Card>
-  );
-}
