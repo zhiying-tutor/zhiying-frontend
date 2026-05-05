@@ -19,6 +19,7 @@ export const studySubjectStatus = z.enum([
 
 export const studyStageStatus = z.enum(["LOCKED", "STUDYING", "FINISHED"]);
 export const studyTaskStatus = z.enum(["LOCKED", "STUDYING", "FINISHED"]);
+export type StudyTaskStatus = z.infer<typeof studyTaskStatus>;
 export const studyQuizStatus = z.enum(["QUEUING", "GENERATING", "READY", "SUBMITTED", "FAILED"]);
 export const resourceStatus = z.enum(["QUEUING", "GENERATING", "FINISHED", "FAILED"]);
 
@@ -132,13 +133,34 @@ export const storageConfigSchema = z.object({
 });
 export type StorageConfig = z.infer<typeof storageConfigSchema>;
 
+export const resourceConfigSchema = z.object({
+  knowledge_video_diamond_cost: z.number().int(),
+  interactive_html_gold_cost: z.number().int(),
+});
+export type ResourceConfig = z.infer<typeof resourceConfigSchema>;
+
 export const publicConfigSchema = z.object({
   study_subject: z.object({
     pricing: z.array(studySubjectPricingItemSchema),
   }),
   storage: storageConfigSchema,
+  resource: resourceConfigSchema,
 });
 export type PublicConfig = z.infer<typeof publicConfigSchema>;
+
+export const createKnowledgeVideoResponseSchema = z.object({
+  knowledge_video_id: z.number().int(),
+});
+export type CreateKnowledgeVideoResponse = z.infer<
+  typeof createKnowledgeVideoResponseSchema
+>;
+
+export const createInteractiveHtmlResponseSchema = z.object({
+  interactive_html_id: z.number().int(),
+});
+export type CreateInteractiveHtmlResponse = z.infer<
+  typeof createInteractiveHtmlResponseSchema
+>;
 
 export const pretestProblemSchema = z.object({
   id: z.number().int(),

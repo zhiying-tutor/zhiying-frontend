@@ -1,8 +1,11 @@
+import { Loader2 } from "lucide-react";
 import { redirect } from "next/navigation";
 
+import { ContentCard } from "@/components/learn/content-card";
 import { ExplanationViewer } from "@/components/learn/explanation-viewer";
 import { InteractiveHtmlViewer } from "@/components/learn/interactive-html-viewer";
 import { MarkmapCard } from "@/components/learn/markmap-card";
+import { ResourceGenerateCard } from "@/components/learn/resource-generate-card";
 import { TaskSidebar } from "@/components/learn/task-sidebar";
 import { VideoViewer } from "@/components/learn/video-viewer";
 import { serverFetch } from "@/lib/api/client";
@@ -47,11 +50,6 @@ export default async function TaskPage({
     stage = null;
   }
 
-  const hasResource =
-    task.knowledge_video_id != null ||
-    task.interactive_html_id != null ||
-    task.knowledge_explanation_id != null;
-
   return (
     <div className="flex h-dvh w-full overflow-hidden bg-canvas">
       <main className="flex flex-1 flex-col gap-10 overflow-y-auto px-8 py-10 sm:px-16 sm:py-14 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded [&::-webkit-scrollbar-thumb]:bg-border-muted [&::-webkit-scrollbar-thumb:hover]:bg-border-strong [&::-webkit-scrollbar-track]:bg-transparent">
@@ -70,32 +68,55 @@ export default async function TaskPage({
           </p>
         </header>
 
-        {task.knowledge_explanation_id != null && (
+        {task.knowledge_explanation_id != null ? (
           <>
             <MarkmapCard id={task.knowledge_explanation_id} />
             <ExplanationViewer id={task.knowledge_explanation_id} />
           </>
-        )}
-        {task.knowledge_video_id != null && (
-          <VideoViewer id={task.knowledge_video_id} />
-        )}
-        {task.interactive_html_id != null && (
-          <InteractiveHtmlViewer id={task.interactive_html_id} />
+        ) : (
+          <ExplanationPendingCard />
         )}
 
-        {!hasResource && (
-          <div className="rounded-2xl border-2 border-dashed border-border-strong/30 bg-white/60 px-6 py-10 text-center">
-            <p className="text-sm font-bold text-brand-dark">
-              该任务暂无内容资源
-            </p>
-            <p className="mt-2 text-xs leading-relaxed text-brand-medium">
-              该任务尚未关联任何视频 / 互动 HTML / 文字讲解资源。
-            </p>
-          </div>
+        {task.knowledge_video_id != null ? (
+          <VideoViewer id={task.knowledge_video_id} />
+        ) : (
+          <ResourceGenerateCard
+            taskId={task.id}
+            taskStatus={task.status}
+            kind="knowledge-video"
+          />
+        )}
+
+        {task.interactive_html_id != null ? (
+          <InteractiveHtmlViewer id={task.interactive_html_id} />
+        ) : (
+          <ResourceGenerateCard
+            taskId={task.id}
+            taskStatus={task.status}
+            kind="interactive-html"
+          />
         )}
       </main>
 
       <TaskSidebar task={task} stage={stage} />
     </div>
+  );
+}
+
+function ExplanationPendingCard() {
+  return (
+    <ContentCard
+      theme="purple"
+      icon={<Loader2 className="animate-spin" />}
+      title="深度解析"
+      subtitle="文字化讲解"
+    >
+      <div className="rounded-2xl border border-dashed border-[color-mix(in_oklch,var(--palette-purple)_30%,transparent)] bg-white/50 px-6 py-10 text-center">
+        <p className="text-sm font-bold text-brand-dark">讲稿正在生成中…</p>
+        <p className="mt-2 text-xs leading-relaxed text-brand-medium">
+          创建学习主题时已为本任务自动派发讲稿生成，请稍候片刻刷新查看。
+        </p>
+      </div>
+    </ContentCard>
   );
 }
