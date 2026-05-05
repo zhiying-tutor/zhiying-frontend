@@ -2,7 +2,10 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
+
+import type { PublicConfig, User } from "@/lib/api/schemas";
+import { configQueryKey, meQueryKey } from "./keys";
 
 const isServer = typeof window === "undefined";
 
@@ -27,8 +30,21 @@ function getQueryClient(): QueryClient {
   return browserClient;
 }
 
-export function QueryProvider({ children }: { children: ReactNode }) {
-  const client = getQueryClient();
+export function QueryProvider({
+  children,
+  initialConfig,
+  initialMe,
+}: {
+  children: ReactNode;
+  initialConfig: PublicConfig;
+  initialMe: User | null;
+}) {
+  const [client] = useState(() => {
+    const qc = getQueryClient();
+    qc.setQueryData(configQueryKey, initialConfig);
+    qc.setQueryData(meQueryKey, initialMe);
+    return qc;
+  });
   return (
     <QueryClientProvider client={client}>
       {children}

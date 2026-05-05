@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
+import { useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { LogInIcon } from "lucide-react";
 
@@ -10,6 +11,7 @@ import { PasswordField } from "./fields/password-field";
 import { SubmitButton } from "./fields/submit-button";
 import { UsernameField } from "./fields/username-field";
 import { FieldGroup } from "@/components/ui/field";
+import { meQueryKey } from "@/lib/query/keys";
 
 const schema = z.object({
   username: z.string().min(3, "用户名至少 3 位").max(32, "用户名最多 32 位"),
@@ -19,6 +21,7 @@ const schema = z.object({
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
   const next = searchParams.get("next") || "/dashboard";
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -37,6 +40,9 @@ export function LoginForm() {
         setSubmitError(data.message ?? "请求失败，请稍后再试");
         return;
       }
+      // 让 root layout 重新拉 /me 并注水；同时让 client cache 失效，
+      // 防止登录后旧 tab 仍持有“未登录态”的 me 缓存。
+      await queryClient.invalidateQueries({ queryKey: meQueryKey });
       router.push(next);
       router.refresh();
     },

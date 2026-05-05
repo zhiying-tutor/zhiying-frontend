@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "@tanstack/react-form";
+import { useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { KeyRoundIcon, UserPlusIcon } from "lucide-react";
 
@@ -10,6 +11,7 @@ import { PasswordField } from "./fields/password-field";
 import { SubmitButton } from "./fields/submit-button";
 import { UsernameField } from "./fields/username-field";
 import { FieldGroup } from "@/components/ui/field";
+import { meQueryKey } from "@/lib/query/keys";
 
 const schema = z
   .object({
@@ -25,6 +27,7 @@ const schema = z
 export function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const queryClient = useQueryClient();
   const next = searchParams.get("next") || "/dashboard";
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -46,6 +49,7 @@ export function RegisterForm() {
         setSubmitError(data.message ?? "请求失败，请稍后再试");
         return;
       }
+      await queryClient.invalidateQueries({ queryKey: meQueryKey });
       router.push(next);
       router.refresh();
     },

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { BookOpen, Coins, Crown, Flame, Gem, LogOut } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { logoutAction } from "@/app/(app)/dashboard/actions";
 import { CheckinButton } from "@/components/dashboard/checkin-button";
@@ -21,8 +22,20 @@ export function DashboardAsideClient({
   checkedToday: boolean;
 }) {
   const [profileOpen, setProfileOpen] = useState(false);
+  const [, startLogout] = useTransition();
+  const queryClient = useQueryClient();
   const level = levelFromExp(user.exp);
   const needsProfile = user.birth_year === null;
+
+  const handleLogout = () => {
+    startLogout(async () => {
+      // server action 清 cookie 并 redirect 到 /login；
+      // 客户端这里同步把 me / config 等所有 cache 清干净，
+      // 避免登出后被新登录用户看到上一个账号的缓存。
+      queryClient.clear();
+      await logoutAction();
+    });
+  };
 
   return (
     <div className="flex h-full flex-col">
@@ -90,7 +103,7 @@ export function DashboardAsideClient({
             alreadyCheckedToday={checkedToday}
             className="flex-1"
           />
-          <form action={logoutAction}>
+          <form action={handleLogout}>
             <button
               type="submit"
               title="登出账号"

@@ -126,10 +126,17 @@ export const studySubjectPricingItemSchema = z.object({
 });
 export type StudySubjectPricingItem = z.infer<typeof studySubjectPricingItemSchema>;
 
+export const storageConfigSchema = z.object({
+  public_base: z.url(),
+  bucket: z.string(),
+});
+export type StorageConfig = z.infer<typeof storageConfigSchema>;
+
 export const publicConfigSchema = z.object({
   study_subject: z.object({
     pricing: z.array(studySubjectPricingItemSchema),
   }),
+  storage: storageConfigSchema,
 });
 export type PublicConfig = z.infer<typeof publicConfigSchema>;
 
@@ -226,7 +233,7 @@ const resourceBase = {
 
 export const knowledgeVideoSchema = z.object({
   ...resourceBase,
-  url: z.string().nullable(),
+  object_key: z.string().nullable(),
 });
 export const codeVideoSchema = knowledgeVideoSchema;
 export const interactiveHtmlSchema = knowledgeVideoSchema;

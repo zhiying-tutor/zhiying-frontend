@@ -3,6 +3,9 @@ import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
+import { getPublicConfig } from "@/lib/api/public-config";
+import { getSession } from "@/lib/auth/session";
+import { QueryProvider } from "@/lib/query/provider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -21,11 +24,13 @@ export const metadata: Metadata = {
   description: "AI 驱动的个性化学习伙伴",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [config, me] = await Promise.all([getPublicConfig(), getSession()]);
+
   return (
     <html
       lang="zh-CN"
@@ -39,8 +44,10 @@ export default function RootLayout({
       )}
     >
       <body className="min-h-full flex flex-col">
-        {children}
-        <Toaster />
+        <QueryProvider initialConfig={config} initialMe={me}>
+          {children}
+          <Toaster />
+        </QueryProvider>
       </body>
     </html>
   );
