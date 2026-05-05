@@ -12,7 +12,18 @@ export function MarkmapView({ markdown }: { markdown: string }) {
   useEffect(() => {
     if (!svgRef.current) return;
     const { root } = transformer.transform(markdown);
-    const mm = Markmap.create(svgRef.current, undefined, root);
+    const brandGold = getComputedStyle(document.documentElement)
+      .getPropertyValue("--brown-gold")
+      .trim();
+    const mm = Markmap.create(
+      svgRef.current,
+      {
+        zoom: false,
+        pan: false,
+        color: () => brandGold || "#be8944",
+      },
+      root,
+    );
     return () => {
       mm.destroy();
     };
