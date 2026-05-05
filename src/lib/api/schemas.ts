@@ -241,7 +241,6 @@ export const interactiveHtmlSchema = knowledgeVideoSchema;
 export const knowledgeExplanationSchema = z.object({
   ...resourceBase,
   content: z.string().nullable(),
-  mindmap: z.unknown().nullable(),
 });
 
 export type KnowledgeVideo = z.infer<typeof knowledgeVideoSchema>;
