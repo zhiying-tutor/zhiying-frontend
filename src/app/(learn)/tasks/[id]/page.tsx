@@ -7,7 +7,12 @@ import { TaskSidebar } from "@/components/learn/task-sidebar";
 import { VideoViewer } from "@/components/learn/video-viewer";
 import { serverFetch } from "@/lib/api/client";
 import { ApiError } from "@/lib/api/errors";
-import { studyTaskSchema, type StudyTask } from "@/lib/api/schemas";
+import {
+  studyStageDetailSchema,
+  studyTaskSchema,
+  type StudyStageDetail,
+  type StudyTask,
+} from "@/lib/api/schemas";
 
 export default async function TaskPage({
   params,
@@ -30,6 +35,16 @@ export default async function TaskPage({
       redirect("/dashboard");
     }
     throw err;
+  }
+
+  let stage: StudyStageDetail | null = null;
+  try {
+    stage = await serverFetch<StudyStageDetail>(
+      `/study-stages/${task.study_stage_id}`,
+      { schema: studyStageDetailSchema },
+    );
+  } catch {
+    stage = null;
   }
 
   const hasResource =
@@ -80,7 +95,7 @@ export default async function TaskPage({
         )}
       </main>
 
-      <TaskSidebar />
+      <TaskSidebar task={task} stage={stage} />
     </div>
   );
 }

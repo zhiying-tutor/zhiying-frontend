@@ -178,6 +178,7 @@ export const studyStageListSchema = z.array(studyStageDetailSchema);
 
 export const studyTaskSchema = z.object({
   id: z.number().int(),
+  study_stage_id: z.number().int(),
   title: z.string(),
   description: z.string(),
   sort_order: z.number().int(),

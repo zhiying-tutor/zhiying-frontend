@@ -1,16 +1,53 @@
 import { ArrowLeft, Bot, Check, Send } from "lucide-react";
 import Link from "next/link";
 
-export function TaskSidebar() {
+import type { StudyStageDetail, StudyTask } from "@/lib/api/schemas";
+
+export function TaskSidebar({
+  task,
+  stage,
+}: {
+  task: StudyTask;
+  stage: StudyStageDetail | null;
+}) {
+  const finished = stage?.finished_tasks ?? 0;
+  const total = stage?.total_tasks ?? 0;
+
+  const upcoming = stage?.tasks
+    .filter(
+      (t) => t.sort_order > task.sort_order && t.status !== "FINISHED",
+    )
+    .sort((a, b) => a.sort_order - b.sort_order)[0];
+
+  const nextLabel =
+    stage == null ? "—" : upcoming ? upcoming.title : "本阶段已全部完成";
+
+  const stageDone = stage?.status === "FINISHED";
+
   return (
     <aside className="flex w-[clamp(320px,30vw,450px)] flex-shrink-0 flex-col border-l-2 border-border-strong/15 bg-[color-mix(in_oklch,var(--bg-canvas)_60%,transparent)] backdrop-blur-xl">
-      <SidebarTopSection />
+      <SidebarTopSection
+        finished={finished}
+        total={total}
+        nextLabel={nextLabel}
+        stageDone={stageDone}
+      />
       <AICompanion />
     </aside>
   );
 }
 
-function SidebarTopSection() {
+function SidebarTopSection({
+  finished,
+  total,
+  nextLabel,
+  stageDone,
+}: {
+  finished: number;
+  total: number;
+  nextLabel: string;
+  stageDone: boolean;
+}) {
   return (
     <div className="relative flex-shrink-0 border-b border-dashed border-border-strong/30">
       <div
@@ -51,16 +88,20 @@ function SidebarTopSection() {
       <div className="relative z-10 px-5 pb-6 pt-2">
         <div className="rounded-[20px] border border-white/70 bg-white/55 p-5 shadow-[0_4px_12px_color-mix(in_oklch,var(--border-strong)_15%,transparent)] backdrop-blur-md">
           <h3 className="mb-5 text-[15px] font-extrabold uppercase tracking-[0.1em] text-brand-light">
-            今日突击进度
+            当前阶段进度
           </h3>
           <div className="flex items-center gap-5">
-            <ProgressRing value={3} total={5} />
+            <ProgressRing
+              value={finished}
+              total={total}
+              showBadge={stageDone}
+            />
             <div className="min-w-0 flex-1">
               <div className="mb-1.5 text-[19px] font-extrabold text-brand-deep">
-                当前节点突击
+                下一节点
               </div>
               <div className="truncate text-sm text-brand-medium">
-                下一个：待规划
+                {nextLabel}
               </div>
             </div>
           </div>
@@ -70,8 +111,16 @@ function SidebarTopSection() {
   );
 }
 
-function ProgressRing({ value, total }: { value: number; total: number }) {
-  const ratio = Math.max(0, Math.min(1, value / Math.max(total, 1)));
+function ProgressRing({
+  value,
+  total,
+  showBadge,
+}: {
+  value: number;
+  total: number;
+  showBadge: boolean;
+}) {
+  const ratio = total <= 0 ? 0 : Math.max(0, Math.min(1, value / total));
   const dash = `${Math.round(ratio * 100)}, 100`;
   return (
     <div className="relative flex size-[76px] items-center justify-center rounded-full bg-canvas p-1 shadow-[0_4px_8px_color-mix(in_oklch,var(--border-strong)_20%,transparent)]">
@@ -94,9 +143,11 @@ function ProgressRing({ value, total }: { value: number; total: number }) {
       <div className="absolute text-lg font-extrabold text-brand-dark">
         {value}/{total}
       </div>
-      <div className="absolute -bottom-0.5 -right-0.5 z-10 flex size-[22px] items-center justify-center rounded-full border-2 border-canvas bg-gradient-to-br from-palette-blue-lighter to-palette-blue-light text-white shadow-[0_2px_4px_color-mix(in_oklch,var(--palette-blue)_30%,transparent)]">
-        <Check className="size-3" strokeWidth={3} />
-      </div>
+      {showBadge && (
+        <div className="absolute -bottom-0.5 -right-0.5 z-10 flex size-[22px] items-center justify-center rounded-full border-2 border-canvas bg-gradient-to-br from-palette-blue-lighter to-palette-blue-light text-white shadow-[0_2px_4px_color-mix(in_oklch,var(--palette-blue)_30%,transparent)]">
+          <Check className="size-3" strokeWidth={3} />
+        </div>
+      )}
     </div>
   );
 }
