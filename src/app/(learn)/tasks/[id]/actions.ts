@@ -19,6 +19,10 @@ export type CreateInteractiveHtmlActionResult =
   | { ok: true; data: CreateInteractiveHtmlResponse }
   | { ok: false; message: string };
 
+export type CompleteTaskActionResult =
+  | { ok: true }
+  | { ok: false; message: string };
+
 function validatePrompt(prompt: string): string | null {
   const trimmed = prompt.trim();
   if (trimmed.length < 1) return "请填写生成提示词";
@@ -78,6 +82,27 @@ export async function createInteractiveHtmlAction(
     );
     revalidatePath(`/tasks/${taskId}`);
     return { ok: true, data };
+  } catch (e) {
+    if (e instanceof ApiError) {
+      return { ok: false, message: e.message };
+    }
+    throw e;
+  }
+}
+
+export async function completeTaskAction(
+  taskId: number,
+): Promise<CompleteTaskActionResult> {
+  if (!Number.isInteger(taskId) || taskId <= 0) {
+    return { ok: false, message: "无效的任务" };
+  }
+  try {
+    await serverFetch(`/study-tasks/${taskId}/complete`, {
+      method: "POST",
+      body: {},
+    });
+    revalidatePath(`/tasks/${taskId}`);
+    return { ok: true };
   } catch (e) {
     if (e instanceof ApiError) {
       return { ok: false, message: e.message };

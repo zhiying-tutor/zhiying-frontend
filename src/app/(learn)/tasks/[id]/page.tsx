@@ -6,6 +6,7 @@ import { ExplanationViewer } from "@/components/learn/explanation-viewer";
 import { InteractiveHtmlViewer } from "@/components/learn/interactive-html-viewer";
 import { MarkmapCard } from "@/components/learn/markmap-card";
 import { ResourceGenerateCard } from "@/components/learn/resource-generate-card";
+import { TaskCompleteCard } from "@/components/learn/task-complete-card";
 import { TaskSidebar } from "@/components/learn/task-sidebar";
 import { VideoViewer } from "@/components/learn/video-viewer";
 import { serverFetch } from "@/lib/api/client";
@@ -96,6 +97,16 @@ export default async function TaskPage({
             kind="interactive-html"
           />
         )}
+
+        <TaskCompleteCard
+          taskId={task.id}
+          taskStatus={task.status}
+          nextTaskId={
+            stage?.tasks
+              .filter((t) => t.sort_order > task.sort_order)
+              .sort((a, b) => a.sort_order - b.sort_order)[0]?.id ?? null
+          }
+        />
       </main>
 
       <TaskSidebar task={task} stage={stage} />
