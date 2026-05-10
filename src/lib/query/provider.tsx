@@ -1,11 +1,13 @@
 "use client";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  HydrationBoundary,
+  QueryClient,
+  QueryClientProvider,
+  type DehydratedState,
+} from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useState, type ReactNode } from "react";
-
-import type { PublicConfig, User } from "@/lib/api/schemas";
-import { configQueryKey, meQueryKey } from "./keys";
 
 const isServer = typeof window === "undefined";
 
@@ -32,22 +34,15 @@ function getQueryClient(): QueryClient {
 
 export function QueryProvider({
   children,
-  initialConfig,
-  initialMe,
+  dehydratedState,
 }: {
   children: ReactNode;
-  initialConfig: PublicConfig;
-  initialMe: User | null;
+  dehydratedState: DehydratedState;
 }) {
-  const [client] = useState(() => {
-    const qc = getQueryClient();
-    qc.setQueryData(configQueryKey, initialConfig);
-    qc.setQueryData(meQueryKey, initialMe);
-    return qc;
-  });
+  const [client] = useState(getQueryClient);
   return (
     <QueryClientProvider client={client}>
-      {children}
+      <HydrationBoundary state={dehydratedState}>{children}</HydrationBoundary>
       {process.env.NODE_ENV === "development" ? (
         <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left" />
       ) : null}

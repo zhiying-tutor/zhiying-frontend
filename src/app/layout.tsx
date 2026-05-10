@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { dehydrate, QueryClient } from "@tanstack/react-query";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
 import { getPublicConfig } from "@/lib/api/public-config";
 import { getSession } from "@/lib/auth/session";
+import { configQueryKey, meQueryKey } from "@/lib/query/keys";
 import { QueryProvider } from "@/lib/query/provider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -31,6 +33,11 @@ export default async function RootLayout({
 }>) {
   const [config, me] = await Promise.all([getPublicConfig(), getSession()]);
 
+  const queryClient = new QueryClient();
+  queryClient.setQueryData(configQueryKey, config);
+  queryClient.setQueryData(meQueryKey, me);
+  const dehydratedState = dehydrate(queryClient);
+
   return (
     <html
       lang="zh-CN"
@@ -44,7 +51,7 @@ export default async function RootLayout({
       )}
     >
       <body className="min-h-full flex flex-col">
-        <QueryProvider initialConfig={config} initialMe={me}>
+        <QueryProvider dehydratedState={dehydratedState}>
           {children}
           <Toaster />
         </QueryProvider>
