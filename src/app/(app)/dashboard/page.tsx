@@ -18,7 +18,7 @@ import { getSession } from "@/lib/auth/session";
 import {
   studySubjectListQueryKey,
   studySubjectQueryKey,
-} from "@/lib/query/study-subject";
+} from "@/lib/query/keys";
 
 export default async function DashboardPage() {
   const [user, subjects, config] = await Promise.all([

@@ -7,7 +7,10 @@ import {
   studySubjectSchema,
   type StudySubject,
 } from "@/lib/api/schemas";
+import { studySubjectListQueryKey, studySubjectQueryKey } from "./keys";
 import { getJson } from "./utils";
+
+export { studySubjectListQueryKey, studySubjectQueryKey };
 
 const POLL_INTERVAL_MS = 2000;
 
@@ -17,14 +20,6 @@ const POLLING_STATUSES = new Set<StudySubject["status"]>([
   "PLAN_QUEUING",
   "PLAN_GENERATING",
 ]);
-
-export function studySubjectQueryKey(id: number) {
-  return ["study-subject", id] as const;
-}
-
-export function studySubjectListQueryKey() {
-  return ["study-subject", "list"] as const;
-}
 
 async function fetchStudySubject(id: number): Promise<StudySubject> {
   return studySubjectSchema.parse(await getJson(`/api/study-subjects/${id}`));
