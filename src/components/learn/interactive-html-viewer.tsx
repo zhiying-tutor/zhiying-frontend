@@ -5,26 +5,39 @@ import type { ReactNode } from "react";
 
 import { interactiveHtmlSchema } from "@/lib/api/schemas";
 import { useConfig } from "@/lib/query/config";
-import { useResource } from "@/lib/query/resource";
+import { useResource, type ResourceSource } from "@/lib/query/resource";
 import { assetUrl } from "@/lib/storage";
 
 import { ContentCard } from "./content-card";
 
-export function InteractiveHtmlViewer({ id }: { id: number }) {
+export type InteractiveHtmlViewerSource =
+  | { kind: "task"; taskId: number }
+  | { kind: "tool"; id: number };
+
+export function InteractiveHtmlViewer({
+  source,
+  title = "具身交互沙盒",
+  subtitle = "全沉浸可交互环境",
+  showCard = true,
+}: {
+  source: InteractiveHtmlViewerSource;
+  title?: string;
+  subtitle?: string;
+  showCard?: boolean;
+}) {
   const { storage } = useConfig();
+  const innerSource: ResourceSource =
+    source.kind === "task"
+      ? { kind: "task", taskId: source.taskId, resourceKind: "interactive-html" }
+      : { kind: "tool", resourceKind: "interactive-htmls", id: source.id };
+
   const { data, isPending, isError, error } = useResource({
-    kind: "interactive-htmls",
-    id,
+    source: innerSource,
     schema: interactiveHtmlSchema,
   });
 
-  return (
-    <ContentCard
-      theme="green"
-      icon={<Box />}
-      title="具身交互沙盒"
-      subtitle="全沉浸可交互环境"
-    >
+  const body = (
+    <>
       {isPending && <Placeholder />}
 
       {isError && (
@@ -56,6 +69,14 @@ export function InteractiveHtmlViewer({ id }: { id: number }) {
           className="aspect-video w-full rounded-2xl border border-[color-mix(in_oklch,var(--palette-green-light)_50%,transparent)] bg-white"
         />
       )}
+    </>
+  );
+
+  if (!showCard) return body;
+
+  return (
+    <ContentCard theme="green" icon={<Box />} title={title} subtitle={subtitle}>
+      {body}
     </ContentCard>
   );
 }

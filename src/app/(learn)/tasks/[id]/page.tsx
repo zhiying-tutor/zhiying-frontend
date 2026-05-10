@@ -83,7 +83,7 @@ export default async function TaskPage({
         )}
 
         {task.knowledge_video_id != null ? (
-          <VideoViewer id={task.knowledge_video_id} />
+          <VideoViewer source={{ kind: "task", taskId: task.id }} />
         ) : (
           <ResourceGenerateCard
             taskId={task.id}
@@ -93,7 +93,7 @@ export default async function TaskPage({
         )}
 
         {task.interactive_html_id != null ? (
-          <InteractiveHtmlViewer id={task.interactive_html_id} />
+          <InteractiveHtmlViewer source={{ kind: "task", taskId: task.id }} />
         ) : (
           <ResourceGenerateCard
             taskId={task.id}

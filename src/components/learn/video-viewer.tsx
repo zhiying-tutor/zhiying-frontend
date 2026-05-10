@@ -5,26 +5,39 @@ import type { ReactNode } from "react";
 
 import { knowledgeVideoSchema } from "@/lib/api/schemas";
 import { useConfig } from "@/lib/query/config";
-import { useResource } from "@/lib/query/resource";
+import { useResource, type ResourceSource } from "@/lib/query/resource";
 import { assetUrl } from "@/lib/storage";
 
 import { ContentCard } from "./content-card";
 
-export function VideoViewer({ id }: { id: number }) {
+export type VideoViewerSource =
+  | { kind: "task"; taskId: number }
+  | { kind: "tool"; resourceKind: "knowledge-videos" | "code-videos"; id: number };
+
+export function VideoViewer({
+  source,
+  title = "沉浸视界",
+  subtitle = "知识点视频化解析",
+  showCard = true,
+}: {
+  source: VideoViewerSource;
+  title?: string;
+  subtitle?: string;
+  showCard?: boolean;
+}) {
   const { storage } = useConfig();
+  const innerSource: ResourceSource =
+    source.kind === "task"
+      ? { kind: "task", taskId: source.taskId, resourceKind: "knowledge-video" }
+      : { kind: "tool", resourceKind: source.resourceKind, id: source.id };
+
   const { data, isPending, isError, error } = useResource({
-    kind: "knowledge-videos",
-    id,
+    source: innerSource,
     schema: knowledgeVideoSchema,
   });
 
-  return (
-    <ContentCard
-      theme="blue"
-      icon={<Film />}
-      title="沉浸视界"
-      subtitle="知识点视频化解析"
-    >
+  const body = (
+    <>
       {isPending && <Placeholder />}
 
       {isError && (
@@ -43,7 +56,7 @@ export function VideoViewer({ id }: { id: number }) {
           <Placeholder>
             <div className="flex items-center gap-2 text-sm font-bold text-brand-medium">
               <Loader2 className="size-4 animate-spin" />
-              知识视频生成中…
+              视频生成中…
             </div>
           </Placeholder>
         )}
@@ -55,6 +68,14 @@ export function VideoViewer({ id }: { id: number }) {
           src={assetUrl(data.object_key, storage)}
         />
       )}
+    </>
+  );
+
+  if (!showCard) return body;
+
+  return (
+    <ContentCard theme="blue" icon={<Film />} title={title} subtitle={subtitle}>
+      {body}
     </ContentCard>
   );
 }

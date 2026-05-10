@@ -30,8 +30,7 @@ const PROSE_CLASSES = [
 
 export function ExplanationViewer({ id }: { id: number }) {
   const { data, isPending, isError, error } = useResource({
-    kind: "knowledge-explanations",
-    id,
+    source: { kind: "explanation", id },
     schema: knowledgeExplanationSchema,
   });
 
