@@ -5,12 +5,14 @@ import { ContentCard } from "@/components/learn/content-card";
 import { ExplanationViewer } from "@/components/learn/explanation-viewer";
 import { InteractiveHtmlViewer } from "@/components/learn/interactive-html-viewer";
 import { MarkmapCard } from "@/components/learn/markmap-card";
+import { QuizSection } from "@/components/learn/quiz-section";
 import { ResourceGenerateCard } from "@/components/learn/resource-generate-card";
 import { TaskCompleteCard } from "@/components/learn/task-complete-card";
 import { TaskSidebar } from "@/components/learn/task-sidebar";
 import { VideoViewer } from "@/components/learn/video-viewer";
 import { serverFetch } from "@/lib/api/client";
 import { ApiError } from "@/lib/api/errors";
+import { getPublicConfig } from "@/lib/api/public-config";
 import {
   studyStageDetailSchema,
   studyTaskSchema,
@@ -50,6 +52,8 @@ export default async function TaskPage({
   } catch {
     stage = null;
   }
+
+  const config = await getPublicConfig();
 
   return (
     <div className="flex h-dvh w-full overflow-hidden bg-canvas">
@@ -97,6 +101,13 @@ export default async function TaskPage({
             kind="interactive-html"
           />
         )}
+
+        <QuizSection
+          taskId={task.id}
+          taskStatus={task.status}
+          freeLimit={config.resource.study_quiz_free_limit_per_task}
+          extraGoldCost={config.resource.study_quiz_extra_gold_cost}
+        />
 
         <TaskCompleteCard
           taskId={task.id}

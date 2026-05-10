@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-export type ContentCardTheme = "yellow" | "purple" | "blue" | "green";
+export type ContentCardTheme = "yellow" | "purple" | "blue" | "green" | "orange";
 
 const THEME_BG: Record<ContentCardTheme, string> = {
   yellow:
@@ -12,6 +12,8 @@ const THEME_BG: Record<ContentCardTheme, string> = {
   blue: "bg-[color-mix(in_oklch,var(--palette-blue-lighter)_55%,transparent)] border-[color-mix(in_oklch,var(--palette-blue-light)_70%,transparent)]",
   green:
     "bg-[color-mix(in_oklch,var(--palette-green-lighter)_55%,transparent)] border-[color-mix(in_oklch,var(--palette-green-light)_70%,transparent)]",
+  orange:
+    "bg-[color-mix(in_oklch,var(--palette-orange-lighter)_45%,transparent)] border-[color-mix(in_oklch,var(--palette-orange-light)_70%,transparent)]",
 };
 
 const THEME_ICON: Record<ContentCardTheme, string> = {
@@ -19,6 +21,7 @@ const THEME_ICON: Record<ContentCardTheme, string> = {
   purple: "text-palette-purple",
   blue: "text-palette-blue",
   green: "text-palette-green",
+  orange: "text-palette-orange",
 };
 
 const THEME_SUBTITLE: Record<ContentCardTheme, string> = {
@@ -26,6 +29,7 @@ const THEME_SUBTITLE: Record<ContentCardTheme, string> = {
   purple: "text-palette-purple",
   blue: "text-palette-blue",
   green: "text-palette-green",
+  orange: "text-palette-orange",
 };
 
 export function ContentCard({

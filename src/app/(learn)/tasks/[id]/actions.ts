@@ -7,8 +7,10 @@ import { ApiError } from "@/lib/api/errors";
 import {
   createInteractiveHtmlResponseSchema,
   createKnowledgeVideoResponseSchema,
+  createStudyQuizResponseSchema,
   type CreateInteractiveHtmlResponse,
   type CreateKnowledgeVideoResponse,
+  type CreateStudyQuizResponse,
 } from "@/lib/api/schemas";
 
 export type CreateKnowledgeVideoActionResult =
@@ -17,6 +19,10 @@ export type CreateKnowledgeVideoActionResult =
 
 export type CreateInteractiveHtmlActionResult =
   | { ok: true; data: CreateInteractiveHtmlResponse }
+  | { ok: false; message: string };
+
+export type CreateStudyQuizActionResult =
+  | { ok: true; data: CreateStudyQuizResponse }
   | { ok: false; message: string };
 
 export type CompleteTaskActionResult =
@@ -78,6 +84,36 @@ export async function createInteractiveHtmlAction(
         method: "POST",
         body: { prompt: trimmed },
         schema: createInteractiveHtmlResponseSchema,
+      },
+    );
+    revalidatePath(`/tasks/${taskId}`);
+    return { ok: true, data };
+  } catch (e) {
+    if (e instanceof ApiError) {
+      return { ok: false, message: e.message };
+    }
+    throw e;
+  }
+}
+
+export async function createStudyQuizAction(
+  taskId: number,
+  prompt: string,
+): Promise<CreateStudyQuizActionResult> {
+  if (!Number.isInteger(taskId) || taskId <= 0) {
+    return { ok: false, message: "无效的任务" };
+  }
+  const trimmed = prompt.trim();
+  const err = validatePrompt(trimmed);
+  if (err) return { ok: false, message: err };
+
+  try {
+    const data = await serverFetch<CreateStudyQuizResponse>(
+      `/study-tasks/${taskId}/quizzes`,
+      {
+        method: "POST",
+        body: { prompt: trimmed },
+        schema: createStudyQuizResponseSchema,
       },
     );
     revalidatePath(`/tasks/${taskId}`);
