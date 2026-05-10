@@ -92,7 +92,7 @@ export function QuizRound({
   const allAnswered = answeredCount === total;
 
   const correctCount = submitted
-    ? sortedProblems.filter((p) => p.chosen_answer === p.problem.answer).length
+    ? sortedProblems.filter((p) => p.chosen_answer === p.answer).length
     : 0;
   const wrongCount = submitted ? total - correctCount : 0;
   const accuracy = submitted ? Math.round((correctCount / total) * 100) : 0;
@@ -125,7 +125,7 @@ export function QuizRound({
 
   const handleToggleFav = () => {
     if (toggleBookmark.isPending) return;
-    toggleBookmark.mutate(current.problem.id, {
+    toggleBookmark.mutate(current.id, {
       onSuccess: () => {
         qc.invalidateQueries({ queryKey: meQueryKey });
       },
@@ -191,18 +191,18 @@ export function QuizRound({
             disabled={toggleBookmark.isPending}
             className={cn(
               "absolute right-0 inline-flex size-9 items-center justify-center rounded-full border transition",
-              current.problem.bookmarked
+              current.bookmarked
                 ? "border-palette-yellow bg-palette-yellow-light text-palette-orange"
                 : "border-border/40 bg-white text-brand-light hover:border-palette-yellow hover:text-palette-orange",
             )}
             aria-label={
-              current.problem.bookmarked ? "取消收藏" : "加入收藏"
+              current.bookmarked ? "取消收藏" : "加入收藏"
             }
           >
             <Star
               className={cn(
                 "size-4",
-                current.problem.bookmarked && "fill-current",
+                current.bookmarked && "fill-current",
               )}
             />
           </button>
@@ -213,12 +213,12 @@ export function QuizRound({
         className="text-base leading-relaxed font-semibold text-brand-dark"
         style={{ whiteSpace: "pre-wrap" }}
       >
-        {current.problem.content}
+        {current.content}
       </div>
 
       <div className="flex flex-col gap-2.5">
         {OPTION_LETTERS.map((letter) => {
-          const text = current.problem[
+          const text = current[
             `choice_${letter.toLowerCase()}` as
               | "choice_a"
               | "choice_b"
@@ -226,7 +226,7 @@ export function QuizRound({
               | "choice_d"
           ];
           const isSelected = current.chosen_answer === letter;
-          const isCorrect = current.problem.answer === letter;
+          const isCorrect = current.answer === letter;
 
           let stateClass =
             "border-palette-yellow-light/80 bg-white hover:-translate-y-0.5 hover:border-palette-orange/60 hover:bg-palette-orange-lighter/20";

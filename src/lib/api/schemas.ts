@@ -78,10 +78,11 @@ export const checkinListItemSchema = z.object({
 export const checkinListSchema = z.array(checkinListItemSchema);
 export type CheckinListItem = z.infer<typeof checkinListItemSchema>;
 
-// ── Problem ──
+// ── Pretest problem ──
 
-export const problemSchema = z.object({
+export const pretestProblemSchema = z.object({
   id: z.number().int(),
+  sort_order: z.number().int(),
   content: z.string(),
   choice_a: z.string(),
   choice_b: z.string(),
@@ -89,15 +90,11 @@ export const problemSchema = z.object({
   choice_d: z.string(),
   answer: problemAnswer,
   explanation: z.string(),
-  bookmarked: z.boolean(),
+  confidence: pretestConfidence.nullable(),
+  chosen_answer: problemAnswer.nullable(),
 });
-export type Problem = z.infer<typeof problemSchema>;
-
-export const problemListItemSchema = problemSchema.extend({
-  created_at: z.number().int(),
-});
-export const problemListSchema = z.array(problemListItemSchema);
-export type ProblemListItem = z.infer<typeof problemListItemSchema>;
+export type PretestProblem = z.infer<typeof pretestProblemSchema>;
+export const pretestListSchema = z.array(pretestProblemSchema);
 
 // ── Study subject ──
 
@@ -180,16 +177,6 @@ export type SubmitStudyQuizResponse = z.infer<
   typeof submitStudyQuizResponseSchema
 >;
 
-export const pretestProblemSchema = z.object({
-  id: z.number().int(),
-  problem: problemSchema,
-  sort_order: z.number().int(),
-  confidence: pretestConfidence.nullable(),
-  chosen_answer: problemAnswer.nullable(),
-});
-export const pretestListSchema = z.array(pretestProblemSchema);
-export type PretestProblem = z.infer<typeof pretestProblemSchema>;
-
 // ── Study stage / task ──
 
 export const studyTaskBriefSchema = z.object({
@@ -245,10 +232,19 @@ export type StudyQuizBrief = z.infer<typeof studyQuizBriefSchema>;
 
 export const studyQuizProblemSchema = z.object({
   id: z.number().int(),
-  problem: problemSchema,
   sort_order: z.number().int(),
+  content: z.string(),
+  choice_a: z.string(),
+  choice_b: z.string(),
+  choice_c: z.string(),
+  choice_d: z.string(),
+  answer: problemAnswer,
+  explanation: z.string(),
   chosen_answer: problemAnswer.nullable(),
+  bookmarked: z.boolean(),
+  mistake_hidden: z.boolean(),
 });
+export type StudyQuizProblem = z.infer<typeof studyQuizProblemSchema>;
 
 export const studyQuizDetailSchema = z.object({
   id: z.number().int(),
@@ -288,3 +284,35 @@ export type KnowledgeVideo = z.infer<typeof knowledgeVideoSchema>;
 export type CodeVideo = z.infer<typeof codeVideoSchema>;
 export type InteractiveHtml = z.infer<typeof interactiveHtmlSchema>;
 export type KnowledgeExplanation = z.infer<typeof knowledgeExplanationSchema>;
+
+// ── Mistakes / bookmarks ──
+
+export const quizProblemSourceSchema = z.object({
+  quiz_id: z.number().int(),
+  task_id: z.number().int(),
+  task_title: z.string(),
+  stage_id: z.number().int(),
+  stage_title: z.string(),
+  subject_id: z.number().int(),
+  subject_name: z.string(),
+});
+export type QuizProblemSource = z.infer<typeof quizProblemSourceSchema>;
+
+export const quizProblemReviewSchema = z.object({
+  id: z.number().int(),
+  sort_order: z.number().int(),
+  content: z.string(),
+  choice_a: z.string(),
+  choice_b: z.string(),
+  choice_c: z.string(),
+  choice_d: z.string(),
+  answer: problemAnswer,
+  explanation: z.string(),
+  chosen_answer: problemAnswer.nullable(),
+  bookmarked: z.boolean(),
+  mistake_hidden: z.boolean(),
+  created_at: z.number().int(),
+  source: quizProblemSourceSchema,
+});
+export const quizProblemReviewListSchema = z.array(quizProblemReviewSchema);
+export type QuizProblemReview = z.infer<typeof quizProblemReviewSchema>;

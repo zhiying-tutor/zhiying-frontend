@@ -217,12 +217,12 @@ export function PretestBoard({
           className="text-base leading-relaxed font-semibold text-brand-dark"
           style={{ whiteSpace: "pre-wrap" }}
         >
-          {current.problem.content}
+          {current.content}
         </div>
 
         <div className="flex flex-col gap-2.5">
           {OPTION_LETTERS.map((letter) => {
-            const text = current.problem[
+            const text = current[
               `choice_${letter.toLowerCase()}` as
                 | "choice_a"
                 | "choice_b"

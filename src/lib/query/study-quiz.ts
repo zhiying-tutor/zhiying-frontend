@@ -119,13 +119,13 @@ export function useSubmitQuiz(quizId: number, taskId: number) {
 export function useToggleProblemBookmark(quizId: number) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (problemId: number) => {
-      await requestJson(`/api/problems/${problemId}/bookmark`, {
+    mutationFn: async (quizProblemId: number) => {
+      await requestJson(`/api/quiz-problems/${quizProblemId}/bookmark`, {
         method: "PATCH",
       });
-      return problemId;
+      return quizProblemId;
     },
-    onMutate: async (problemId) => {
+    onMutate: async (quizProblemId) => {
       const key = quizDetailQueryKey(quizId);
       await qc.cancelQueries({ queryKey: key });
       const previous = qc.getQueryData<StudyQuizDetail>(key);
@@ -133,8 +133,8 @@ export function useToggleProblemBookmark(quizId: number) {
         qc.setQueryData<StudyQuizDetail>(key, {
           ...previous,
           problems: previous.problems.map((p) =>
-            p.problem.id === problemId
-              ? { ...p, problem: { ...p.problem, bookmarked: !p.problem.bookmarked } }
+            p.id === quizProblemId
+              ? { ...p, bookmarked: !p.bookmarked }
               : p,
           ),
         });
