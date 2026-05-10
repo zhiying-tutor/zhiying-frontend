@@ -398,7 +398,7 @@ function DetailDialog({
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent
         showCloseButton={false}
-        className="max-w-[780px] overflow-hidden border-[1.5px] border-palette-yellow-light/50 bg-white/90 p-0 shadow-[0_12px_28px_color-mix(in_oklch,var(--border-muted)_35%,transparent)] backdrop-blur-xl"
+        className="overflow-hidden border-[1.5px] border-palette-yellow-light/50 bg-white/90 p-0 shadow-[0_12px_28px_color-mix(in_oklch,var(--border-muted)_35%,transparent)] backdrop-blur-xl sm:max-w-[820px]"
       >
         <DialogTitle className="sr-only">题目详情</DialogTitle>
         <span
@@ -442,9 +442,17 @@ function DetailDialog({
               </button>
             </div>
 
-            <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-gradient-to-br from-palette-orange to-palette-yellow px-4 py-1.5 text-[15px] font-bold text-white shadow-[0_2px_8px_color-mix(in_oklch,var(--palette-orange)_35%,transparent)] [text-shadow:0_1px_2px_color-mix(in_oklch,var(--brand-medium)_30%,transparent)]">
-              {item.source.subject_name} · {item.source.stage_title} · {item.source.task_title}
-            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-palette-orange to-palette-yellow px-4 py-1.5 text-[15px] font-bold text-white shadow-[0_2px_8px_color-mix(in_oklch,var(--palette-orange)_35%,transparent)] [text-shadow:0_1px_2px_color-mix(in_oklch,var(--brand-medium)_30%,transparent)]">
+                {item.source.task_title}
+              </span>
+              <span className="rounded-full bg-palette-purple-mist px-2.5 py-1 text-xs font-bold text-palette-purple">
+                {item.source.subject_name}
+              </span>
+              <span className="rounded-full bg-palette-blue-mist px-2.5 py-1 text-xs font-bold text-palette-blue">
+                {item.source.stage_title}
+              </span>
+            </div>
 
             <p
               className="text-lg font-semibold leading-[1.7] text-brand-dark"
