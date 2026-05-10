@@ -1,4 +1,4 @@
-import { SearchCode, Sparkles } from "lucide-react";
+import { SearchCode } from "lucide-react";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -24,8 +24,8 @@ export default async function C2VPage() {
 
   return (
     <ToolPageShell
-      title="C2V · 代码题解视频"
-      subtitle="把题目和代码合二为一，AI 自动逐步讲解算法思路与执行过程。"
+      title="Code 2 Video"
+      subtitle="你的专属算法题解视听库"
       badge={{ icon: <SearchCode className="size-4" />, label: "代码题解视频" }}
     >
       <ToolPageClient<CodeVideo>
@@ -33,21 +33,17 @@ export default async function C2VPage() {
         listEndpoint="/api/code-videos"
         createAction={createC2VAction}
         deleteAction={deleteC2VAction}
-        dialogTitle="生成新的 C2V"
-        dialogDescription="AI 会逐步可视化你给定的算法解法"
-        dialogMode={{
+        consoleTitle="输入题目和你的解法"
+        consoleMode={{
           kind: "code-pair",
-          problemPlaceholder:
-            "粘贴题目背景、输入输出格式与约束条件…",
-          codePlaceholder: "粘贴可运行的核心代码…",
+          problemPlaceholder: "请粘贴题目背景、输入输出与约束条件…",
+          codePlaceholder: "请粘贴可运行的核心代码…",
         }}
         currency="diamond"
         cost={config.resource.code_video_diamond_cost}
-        cardThemeAccent="orange"
-        cardThumbnailIcon={<Sparkles strokeWidth={2} />}
         detailKind="code-video"
         emptyHint="还没有生成过任何 C2V 视频。给 AI 一道题和你的解法，它会做成讲解短片。"
-        primaryCtaLabel="开始生成"
+        primaryCtaLabel="在线生成"
       />
     </ToolPageShell>
   );

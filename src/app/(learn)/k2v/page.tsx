@@ -1,4 +1,4 @@
-import { Clapperboard, Sparkles } from "lucide-react";
+import { Clapperboard } from "lucide-react";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -24,8 +24,8 @@ export default async function K2VPage() {
 
   return (
     <ToolPageShell
-      title="K2V · 知识点视频"
-      subtitle="把抽象概念转成生动的解说视频，AI 自动构建分镜、合成语音、渲染输出。"
+      title="Knowledge 2 Video"
+      subtitle="你的专属 AIGC 视频知识库"
       badge={{ icon: <Clapperboard className="size-4" />, label: "知识点视频" }}
     >
       <ToolPageClient<KnowledgeVideo>
@@ -33,20 +33,17 @@ export default async function K2VPage() {
         listEndpoint="/api/knowledge-videos"
         createAction={createK2VAction}
         deleteAction={deleteK2VAction}
-        dialogTitle="生成新的 K2V"
-        dialogDescription="AI 将根据提示词为你生成一段知识点讲解视频"
-        dialogMode={{
+        consoleTitle="输入你需要讲解的知识点"
+        consoleMode={{
           kind: "single",
           placeholder:
-            "例如：用生动的比喻讲解什么是 Python 的闭包函数，并附带简单代码案例。",
+            "例如：请用生动的比喻讲解什么是 Python 的闭包函数，并结合简单的代码案例。最好在讲解的时候附带动画效果辅助理解…",
         }}
         currency="diamond"
         cost={config.resource.knowledge_video_diamond_cost}
-        cardThemeAccent="yellow"
-        cardThumbnailIcon={<Sparkles strokeWidth={2} />}
         detailKind="knowledge-video"
         emptyHint="还没有创建过任何 K2V 视频。给 AI 一个知识点，让它给你拍一支讲解短片。"
-        primaryCtaLabel="开始生成"
+        primaryCtaLabel="在线生成"
       />
     </ToolPageShell>
   );

@@ -14,7 +14,7 @@ function levelFromExp(exp: number) {
   return Math.floor(Math.sqrt(exp / 100));
 }
 
-export function DashboardAsideClient({
+export function DashboardAside({
   user,
   checkedToday,
 }: {

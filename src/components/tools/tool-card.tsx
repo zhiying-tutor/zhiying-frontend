@@ -1,6 +1,6 @@
 "use client";
 
-import { Loader2, Trash2 } from "lucide-react";
+import { Loader2, PlayCircle, Trash2 } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -11,27 +11,21 @@ export type ToolCardStatus = "QUEUING" | "GENERATING" | "FINISHED" | "FAILED";
 export interface ToolCardProps {
   title: string;
   status: ToolCardStatus;
-  createdAt: number;
-  thumbnailIcon: ReactNode;
-  themeAccent: "yellow" | "orange" | "blue";
+  colorIndex: number;
+  thumbnailIcon?: ReactNode;
+  active?: boolean;
   onClick: () => void;
   onDelete: () => void;
   deleting?: boolean;
 }
 
-const ACCENT_BG: Record<ToolCardProps["themeAccent"], string> = {
-  yellow:
-    "bg-gradient-to-br from-palette-yellow-lighter to-palette-yellow-mist",
-  orange:
-    "bg-gradient-to-br from-palette-orange-lighter to-palette-orange-mist",
-  blue: "bg-gradient-to-br from-palette-blue-lighter to-palette-blue-mist",
-};
-
-const ACCENT_TEXT: Record<ToolCardProps["themeAccent"], string> = {
-  yellow: "text-palette-yellow",
-  orange: "text-palette-orange",
-  blue: "text-palette-blue",
-};
+const COVER_GRADIENTS = [
+  "from-palette-blue-lighter to-palette-blue-mist",
+  "from-palette-purple-lighter to-palette-purple-mist",
+  "from-palette-green-lighter to-palette-green-mist",
+  "from-palette-yellow-lighter to-palette-yellow-mist",
+  "from-palette-orange-lighter to-palette-orange-mist",
+];
 
 const STATUS_LABEL: Record<ToolCardStatus, string> = {
   QUEUING: "排队中",
@@ -41,56 +35,49 @@ const STATUS_LABEL: Record<ToolCardStatus, string> = {
 };
 
 const STATUS_BG: Record<ToolCardStatus, string> = {
-  QUEUING: "bg-palette-yellow-light/80 text-palette-orange",
-  GENERATING: "bg-palette-blue-mist text-palette-blue",
-  FINISHED: "bg-palette-green-lighter text-palette-green",
-  FAILED: "bg-destructive/10 text-destructive",
+  QUEUING: "bg-palette-yellow-light/90 text-palette-orange",
+  GENERATING: "bg-palette-blue-mist/90 text-palette-blue",
+  FINISHED: "bg-palette-green-lighter/90 text-palette-green",
+  FAILED: "bg-destructive/15 text-destructive",
 };
-
-function formatTime(ts: number): string {
-  const diff = Date.now() - ts;
-  const m = Math.floor(diff / 60_000);
-  if (m < 1) return "刚刚";
-  if (m < 60) return `${m} 分钟前`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h} 小时前`;
-  const d = Math.floor(h / 24);
-  if (d < 30) return `${d} 天前`;
-  return new Date(ts).toLocaleDateString("zh-CN");
-}
 
 export function ToolCard({
   title,
   status,
-  createdAt,
+  colorIndex,
   thumbnailIcon,
-  themeAccent,
+  active = false,
   onClick,
   onDelete,
   deleting = false,
 }: ToolCardProps) {
+  const gradient = COVER_GRADIENTS[colorIndex % COVER_GRADIENTS.length];
   return (
     <div
-      className="group relative flex cursor-pointer flex-col gap-3 rounded-2xl border border-white/60 bg-white/80 p-4 shadow-[var(--shadow-soft)] backdrop-blur transition-all hover:-translate-y-1 hover:shadow-[var(--shadow-hover)]"
+      className={cn(
+        "group relative flex cursor-pointer flex-col gap-3 rounded-2xl border bg-gradient-to-b from-white/80 to-[color-mix(in_oklch,var(--surface-soft)_40%,transparent)] p-3 shadow-[0_4px_12px_color-mix(in_oklch,var(--border-muted)_15%,transparent)] backdrop-blur transition-all hover:-translate-y-1.5 hover:shadow-[0_12px_24px_color-mix(in_oklch,var(--border-muted)_20%,transparent)]",
+        active
+          ? "border-palette-orange/60 shadow-[0_8px_24px_color-mix(in_oklch,var(--palette-orange)_30%,transparent)]"
+          : "border-white/60 hover:border-palette-orange/40",
+      )}
       onClick={onClick}
     >
       <div
         className={cn(
-          "relative flex aspect-video items-center justify-center overflow-hidden rounded-xl",
-          ACCENT_BG[themeAccent],
+          "relative flex aspect-video items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br shadow-[inset_0_2px_8px_rgba(0,0,0,0.05)]",
+          gradient,
         )}
       >
         <div
-          className={cn(
-            "[&>svg]:size-12 [filter:drop-shadow(0_4px_8px_color-mix(in_oklch,var(--brand-gold)_30%,transparent))]",
-            ACCENT_TEXT[themeAccent],
-          )}
-        >
-          {thumbnailIcon}
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.4)_0%,transparent_60%)]"
+        />
+        <div className="relative text-brand-gold [&>svg]:size-12">
+          {thumbnailIcon ?? <PlayCircle strokeWidth={1.75} />}
         </div>
         <span
           className={cn(
-            "absolute right-2 top-2 rounded-full px-2 py-0.5 text-[11px] font-bold",
+            "absolute right-2 top-2 rounded-full px-2 py-0.5 text-[11px] font-bold backdrop-blur",
             STATUS_BG[status],
           )}
         >
@@ -98,14 +85,9 @@ export function ToolCard({
         </span>
       </div>
 
-      <div className="flex flex-col gap-1">
-        <h3 className="line-clamp-2 text-sm font-extrabold text-brand-dark">
-          {title}
-        </h3>
-        <span className="text-[11px] font-medium text-brand-light">
-          {formatTime(createdAt)}
-        </span>
-      </div>
+      <h4 className="truncate px-1 text-base font-semibold text-brand-medium">
+        {title}
+      </h4>
 
       <Button
         variant="ghost"
