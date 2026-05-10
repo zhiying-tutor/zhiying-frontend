@@ -1,3 +1,4 @@
+import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import { Search } from "lucide-react";
 
 import { ActiveSubjectArea } from "@/components/dashboard/active-subject-area";
@@ -14,6 +15,10 @@ import {
   type StudySubjectPricingItem,
 } from "@/lib/api/schemas";
 import { getSession } from "@/lib/auth/session";
+import {
+  studySubjectListQueryKey,
+  studySubjectQueryKey,
+} from "@/lib/query/study-subject";
 
 export default async function DashboardPage() {
   const [user, subjects, config] = await Promise.all([
@@ -31,54 +36,65 @@ export default async function DashboardPage() {
   const today = new Date().toISOString().slice(0, 10);
   const checkedToday = user.last_checkin === today;
 
-  return (
-    <div className="flex h-dvh w-full bg-canvas">
-      <main className="flex min-w-0 flex-1 flex-col gap-12 overflow-y-auto px-12 py-10 pb-24 lg:px-20">
-        <header className="flex flex-col items-center text-center">
-          <h1 className="mb-8 bg-gradient-to-br from-brand-dark to-palette-orange bg-clip-text text-4xl font-black tracking-tight text-transparent md:text-5xl">
-            智映通学
-            <span className="ml-1 animate-pulse font-normal text-palette-orange [text-shadow:0_0_10px_color-mix(in_oklch,var(--palette-orange)_50%,transparent)]">
-              |
-            </span>
-          </h1>
+  // 把列表和当前选中的 subject 注水到 client cache，覆盖客户端可能残留的旧状态
+  // （例如学前测刚提交后状态从 PRETEST_READY → PLAN_QUEUING）。
+  const queryClient = new QueryClient();
+  queryClient.setQueryData(studySubjectListQueryKey(), subjects);
+  if (active) {
+    queryClient.setQueryData(studySubjectQueryKey(active.id), active);
+  }
+  const dehydratedState = dehydrate(queryClient);
 
-          <div className="relative w-full max-w-[680px]">
-            <div className="flex h-[60px] items-center rounded-3xl border-2 border-palette-yellow-light bg-white/95 shadow-[inset_2px_2px_6px_rgba(0,0,0,0.05),inset_-2px_-2px_6px_rgba(255,255,255,0.8),0_4px_12px_rgba(0,0,0,0.1)] backdrop-blur-sm">
-              <div className="flex h-full cursor-not-allowed items-center gap-2 border-r border-border/30 px-6 text-[15px] font-semibold text-brand-medium select-none">
-                全部
-                <span className="text-[10px]">▼</span>
-              </div>
-              <div className="flex flex-1 items-center gap-3 px-6 text-base text-brand-light">
-                <Search className="size-4" />
-                <span className="font-medium">搜索知识点、计划或问题…</span>
+  return (
+    <HydrationBoundary state={dehydratedState}>
+      <div className="flex h-dvh w-full bg-canvas">
+        <main className="flex min-w-0 flex-1 flex-col gap-12 overflow-y-auto px-12 py-10 pb-24 lg:px-20">
+          <header className="flex flex-col items-center text-center">
+            <h1 className="mb-8 bg-gradient-to-br from-brand-dark to-palette-orange bg-clip-text text-4xl font-black tracking-tight text-transparent md:text-5xl">
+              智映通学
+              <span className="ml-1 animate-pulse font-normal text-palette-orange [text-shadow:0_0_10px_color-mix(in_oklch,var(--palette-orange)_50%,transparent)]">
+                |
+              </span>
+            </h1>
+
+            <div className="relative w-full max-w-[680px]">
+              <div className="flex h-[60px] items-center rounded-3xl border-2 border-palette-yellow-light bg-white/95 shadow-[inset_2px_2px_6px_rgba(0,0,0,0.05),inset_-2px_-2px_6px_rgba(255,255,255,0.8),0_4px_12px_rgba(0,0,0,0.1)] backdrop-blur-sm">
+                <div className="flex h-full cursor-not-allowed items-center gap-2 border-r border-border/30 px-6 text-[15px] font-semibold text-brand-medium select-none">
+                  全部
+                  <span className="text-[10px]">▼</span>
+                </div>
+                <div className="flex flex-1 items-center gap-3 px-6 text-base text-brand-light">
+                  <Search className="size-4" />
+                  <span className="font-medium">搜索知识点、计划或问题…</span>
+                </div>
               </div>
             </div>
-          </div>
-        </header>
+          </header>
 
-        <section className="mx-auto flex w-full max-w-[900px] flex-col gap-6">
-          {active === null ? (
-            <EmptyState pricing={pricing} currentDiamond={user.diamond} />
-          ) : (
-            <>
-              <PlanToolbar
-                active={active}
-                subjects={subjects}
-                pricing={pricing}
-                currentDiamond={user.diamond}
-              />
-              <ActiveSubjectArea subject={active} />
-            </>
-          )}
-        </section>
+          <section className="mx-auto flex w-full max-w-[900px] flex-col gap-6">
+            {active === null ? (
+              <EmptyState pricing={pricing} currentDiamond={user.diamond} />
+            ) : (
+              <>
+                <PlanToolbar
+                  active={active}
+                  subjects={subjects}
+                  pricing={pricing}
+                  currentDiamond={user.diamond}
+                />
+                <ActiveSubjectArea subject={active} />
+              </>
+            )}
+          </section>
 
-        <FeatureGrid />
-      </main>
+          <FeatureGrid />
+        </main>
 
-      <aside className="hidden w-[clamp(320px,30vw,450px)] shrink-0 flex-col overflow-y-auto border-l border-border/40 bg-gradient-to-b from-palette-orange-mist/60 to-canvas lg:flex">
-        <DashboardAside user={user} checkedToday={checkedToday} />
-      </aside>
-    </div>
+        <aside className="hidden w-[clamp(320px,30vw,450px)] shrink-0 flex-col overflow-y-auto border-l border-border/40 bg-gradient-to-b from-palette-orange-mist/60 to-canvas lg:flex">
+          <DashboardAside user={user} checkedToday={checkedToday} />
+        </aside>
+      </div>
+    </HydrationBoundary>
   );
 }
 
