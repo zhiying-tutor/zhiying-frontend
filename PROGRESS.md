@@ -1,61 +1,70 @@
 # PROGRESS.md
 
-最后更新：2026-04-25
+最后更新：2026-05-11
 
 ## 当前状态
 
-项目已完成基础设施（API client、认证、App Shell）、认证入口（登录/注册）、Dashboard（主区 + 右侧栏 parallel route）、以及创建学习主题流程（表单 + 消费确认 + Server Action）。
+核心学习闭环（学前测 → 计划 → 阶段/任务解锁 → 任务页 K2V/Interactive/解释/Quiz → 完成→下一任务）已通；三大工具页（K2V / C2V / Interactive）自由创建画廊上线；错题本/收藏页上线；TanStack Query 注水改用 `dehydrate` + `<HydrationBoundary>`，客户端导航不再被旧 cache 卡住。
 
 ## 已完成
 
-### 阶段 0：基础设施
+### 基础设施
+- Next.js 16.2.3 + React 19 + Tailwind v4 + ShadCN + TanStack Query。
+- 路由分组 `(auth)` / `(app)` / `(learn)`，由 `src/middleware.ts` 按前缀守门。
+- 认证：JWT + httpOnly cookie，浏览器端不接触 token；`serverFetch` 自动注入 `Authorization: Bearer`。
+- 数据层：RSC 直 `serverFetch`；写操作走 Server Action + `revalidatePath`；轮询/跨组件 client cache 用 TanStack Query。
+- Hydration：`dehydrate` + `<HydrationBoundary>` 在 RootLayout 与 Dashboard 注水；query key 工厂统一放 `src/lib/query/keys.ts`，避免 `"use client"` 边界问题。
+- 业务常量从 `GET /api/v1/config` 拉取，前端不硬编码金额。
 
-- `src/lib/api/client.ts`：`serverFetch` 封装——统一 base URL、Authorization 注入、Zod schema 校验、错误归一化。
-- `src/lib/api/schemas.ts`：按后端端点补全 Zod schema（user、study-subject、pretest、study-stage/task/quiz、problem、checkin、四类资源、public config）。
-- `src/app/api/auth/{login,register,logout}/route.ts`：代理后端 `/tokens`、`/users`，写/清 httpOnly cookie。
-- `src/lib/auth/session.ts`：`getSession()` 读 cookie 并调用 `/me`。
-- `src/middleware.ts`：未登录访问受保护路由重定向到 `/login`。
-- `src/app/layout.tsx`：根布局——字体（Inter + Geist）、Toaster。
-- `src/app/globals.css`：N2W 暖色主题 token（`@theme inline`），不覆盖 Tailwind 默认 border-radius。
+### 页面
+- `(auth)/login`、`(auth)/register`：复用 `auth-modal-preview.html` 视觉，TanStack Form + Zod。
+- `(app)/dashboard`：当前主题 + 阶段时间线 + 4 张工具入口卡 + 签到/钻石栏；右栏走 `@aside` parallel route slot。
+- `(app)/mistakes`：错题/收藏列表 + 详情 Dialog（可切换可见性、可取消收藏）。
+- `(learn)/pretest/[id]`：学前测做题 + 提交 → 触发 plan 生成。
+- `(learn)/tasks/[id]`：任务页含 K2V / Interactive viewer / 解释卡 / Quiz 区，资源未生成时显示 `ResourceGenerateCard`。
+- `(learn)/k2v` / `(learn)/c2v` / `(learn)/interactive`：三大工具自由创建画廊。
 
-### 阶段 1：认证入口
+### 组件
+- `components/ui/*`：ShadCN 组件库（按需）。
+- `components/dashboard/*`：active subject area、feature grid、plan toolbar、subjects dialog、签到栏。
+- `components/learn/*`：viewer（video / interactive html / explanation）、resource-generate-card、quiz section、journey timeline。
+- `components/tools/*`：tool-page-shell、tool-console、tool-card、tool-result-player、tool-page-client。
+- `components/mistakes/*`：错题列表卡 + 详情 Dialog。
+- `components/spend-confirm-dialog.tsx`：通用消费确认对话框（钻石/金币、显示余额变化与不足提示）。
+- `components/pretest/*`、`components/auth/*`、`components/panels/*`、`components/skeletons.tsx`。
 
-- `src/app/(auth)/login/page.tsx`、`register/page.tsx`：独立页面，复用 `auth-modal-preview.html` 视觉。
-- `src/components/auth/`：LoginForm、RegisterForm、AuthCardHeader/Footer、共享字段组件。
-- 表单使用 TanStack Form + Zod，提交走 Server Action → 代理 route → 成功后 `redirect('/dashboard')`。
+### API 代理（`src/app/api/...`）
+- 认证：`auth/login`、`auth/logout`、`auth/register`。
+- 用户：`me`、`me/mistakes`、`me/bookmarks`。
+- 学习主题：`study-subjects`（list/get/create/stages/...）、`study-stages`、`study-tasks`（含 `knowledge-video` / `interactive-html` / `quizzes` 子路径）。
+- 小测：`study-quizzes`（含 `submit`、`problems`、`problem detail`）。
+- 工具：`knowledge-videos` / `code-videos` / `interactive-htmls`（list / get / create / delete）。
+- 公开：`config`。
+- 错题/收藏切换：`quiz-problems/[id]/bookmark`、`mistake-visibility`。
 
-### 阶段 2：Dashboard + 布局重构
+### 已修过的坑
+- `useState`-based one-time `setQueryData` 在客户端导航不刷新 → 改用 `dehydrate` + `<HydrationBoundary>`（`10073b6`、`707afc6`）。
+- `studySubjectListQueryKey` 在 `"use client"` 模块导致 RSC 误调 → 拆到 `src/lib/query/keys.ts`（`478b4cc`）。
+- 错题详情 Dialog 视觉与原型对齐（`6210cec`）。
 
-- `src/app/(app)/layout.tsx`：两列布局壳（`children` + `aside` parallel route slot）。
-- `src/app/(app)/@aside/default.tsx`：返回 `null`（软导航 fallback）。
-- `src/app/(app)/@aside/dashboard/page.tsx`：右侧栏——档案 banner + 头像 + 昵称 + 4 格 stats（等级/连续登录/金币/钻石）+ 签到按钮 + 新手图鉴入口 + AI 聊天面板壳。
-- `src/app/(app)/dashboard/page.tsx`：RSC 并发拉 `/me` + `/study-subjects` + `/config`。主区含大标题、搜索栏（视觉占位）、计划列表（带状态徽章 + 进度条）或空态 CTA。
-- `src/app/(app)/dashboard/actions.ts`：`checkinAction()`、`createSubjectAction()` Server Action。
-- `src/components/dashboard/checkin-button.tsx`：客户端签到按钮。
-- 已删除旧侧栏/顶栏组件（sidebar、top-bar、currency-badge）。
+## 进行中 / 未完成
 
-### 阶段 3（部分）：创建学习主题
+- **错误展示统一**：RSC error boundary、Server Action 错误 toast helper、Query 全局 onError 都缺。当前 `serverFetch` 抛 `ApiError` 时直接红屏。
+- **搜索栏**：Dashboard 顶部搜索框为 disabled placeholder，需后端 `q` 参数 + 下拉聚合。
+- **移动端**：`lg:` 隐藏右侧栏的几个页面在窄屏没有替代入口。
+- **设置页 / 用户中心**：改密、登出按钮、消费明细全无。
+- **资源分享**：公开/取消公开切换、公开浏览页都未做。
+- **钻石商店 / 充值**：缺面向用户的购买流程。
+- **任务派生资源加入工具画廊**：需后端反向 link 后再做。
 
-- `src/lib/api/public-config.ts`：`getPublicConfig()` 通过 React `cache()` 拉取 `GET /config`。
-- `src/components/spend-confirm-dialog.tsx`：通用消费确认对话框（支持钻石/金币，显示余额变化与不足提示）。
-- `src/components/dashboard/create-subject-button.tsx`：两步模态框（表单 → 确认）——选择主题、语言（PYTHON/JAVA/CPP/GO/RUST）、阶段数（从 `/config` pricing 拉取）、学习目标。
-- Dashboard EmptyState CTA 已启用；已有计划列表区域新增"新建计划"按钮。
+## 临时决策
 
-### 其他
-
-- 修复 Tailwind v4 圆角：删除 shadcn 生成的 `--radius` 覆盖，回归 Tailwind 原生默认值。
-- 同步后端字段重命名：`total_checkin` → `total_checkins`，`streak_checkin` → `streak_checkins`。
-
-## 尚未完成
-
-- 阶段 3 剩余：状态机轮询（引入 TanStack Query）、学前测页面（`/pretest/[id]`）、骨架加载组件。
-- 阶段 4：学习主线（subjects/tasks 详情页、四类资源渲染、资源生成轮询）。
-- 阶段 5：小测 + 错题本。
-- 阶段 6：游戏化与反馈（奖励弹窗、HUD 联动）。
-- 阶段 7：打磨（空态/错误态/骨架态审查、RSC 边界优化、暗色模式走查）。
+- 工具页放在 `(learn)` 而非 `(app)`，按 prototype 对齐（`0f81184`）。
+- query key 工厂统一放 `src/lib/query/keys.ts`，避免 `"use client"` 边界问题。
+- 业务常量从 `GET /api/v1/config` 读取，前端不硬编码。
 
 ## 下一步建议
 
-1. 引入 TanStack Query，在 `(app)` layout 注入 `QueryClientProvider`。
-2. 实现学前测页面：轮询 `study_subject` 状态至 `PRETEST_READY`，渲染题目列表，逐题 PATCH + POST plan。
-3. 封装骨架加载组件（参考 `skeleton-loading-preview.html`）。
+1. 统一错误展示：补 `error.tsx` 边界 + Server Action 错误 toast helper + Query 全局 `onError`，避免 Next 红屏直出。
+2. 搜索栏点亮：后端就绪后接通 Dashboard 顶部搜索框，下拉聚合 + 跳转详情。
+3. 移动端审查：`(app)/dashboard`、`(learn)/tasks/[id]` 在窄屏的右侧栏内容降级方案。
