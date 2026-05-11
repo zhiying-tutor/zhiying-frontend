@@ -3,6 +3,8 @@
 import {
   BookmarkX,
   BookOpen,
+  Check,
+  ChevronDown,
   Clapperboard,
   FlaskConical,
   Loader2,
@@ -11,7 +13,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 
 import { setActiveSubjectAction } from "@/app/(app)/dashboard/actions";
@@ -33,6 +35,23 @@ type SearchResults = {
   mistakes: QuizProblemReview[];
 };
 
+type Scope =
+  | "all"
+  | "subjects"
+  | "knowledge_videos"
+  | "code_videos"
+  | "interactive_htmls"
+  | "mistakes";
+
+const SCOPE_OPTIONS: { value: Scope; label: string; placeholder: string }[] = [
+  { value: "all", label: "全部", placeholder: "搜索知识点、计划或问题…" },
+  { value: "subjects", label: "学习主题", placeholder: "按主题名称搜索…" },
+  { value: "knowledge_videos", label: "K2V 视频", placeholder: "按知识点 prompt 搜索…" },
+  { value: "code_videos", label: "C2V 视频", placeholder: "按代码题目 prompt 搜索…" },
+  { value: "interactive_htmls", label: "交互式实验室", placeholder: "按实验 prompt 搜索…" },
+  { value: "mistakes", label: "错题本", placeholder: "按错题题干搜索…" },
+];
+
 const EMPTY: SearchResults = {
   subjects: [],
   knowledge_videos: [],
@@ -48,12 +67,19 @@ function truncate(s: string, n = 60): string {
 export function DashboardSearch() {
   const [q, setQ] = useState("");
   const [debounced, setDebounced] = useState("");
+  const [scope, setScope] = useState<Scope>("all");
+  const [scopeOpen, setScopeOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const [results, setResults] = useState<SearchResults>(EMPTY);
   const [loading, setLoading] = useState(false);
   const [, startTransition] = useTransition();
   const router = useRouter();
   const wrapRef = useRef<HTMLDivElement | null>(null);
+
+  const scopeMeta = useMemo(
+    () => SCOPE_OPTIONS.find((o) => o.value === scope) ?? SCOPE_OPTIONS[0],
+    [scope],
+  );
 
   useEffect(() => {
     const t = setTimeout(() => setDebounced(q.trim()), 250);
@@ -68,7 +94,9 @@ export function DashboardSearch() {
     }
     const ctrl = new AbortController();
     setLoading(true);
-    fetch(`/api/search?q=${encodeURIComponent(debounced)}`, {
+    const params = new URLSearchParams({ q: debounced });
+    if (scope !== "all") params.set("scope", scope);
+    fetch(`/api/search?${params.toString()}`, {
       signal: ctrl.signal,
     })
       .then(async (res) => {
@@ -89,12 +117,13 @@ export function DashboardSearch() {
       .finally(() => setLoading(false));
 
     return () => ctrl.abort();
-  }, [debounced]);
+  }, [debounced, scope]);
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
       if (!wrapRef.current?.contains(e.target as Node)) {
         setOpen(false);
+        setScopeOpen(false);
       }
     }
     document.addEventListener("mousedown", onClickOutside);
@@ -112,6 +141,7 @@ export function DashboardSearch() {
 
   const closeAfterNav = () => {
     setOpen(false);
+    setScopeOpen(false);
   };
 
   const handleSubjectClick = (id: number) => {
@@ -126,13 +156,29 @@ export function DashboardSearch() {
     });
   };
 
+  const showSection = (s: Scope) => scope === "all" || scope === s;
+
   return (
     <div ref={wrapRef} className="relative w-full max-w-[680px]">
       <div className="flex h-[60px] items-center rounded-3xl border-2 border-palette-yellow-light bg-white/95 shadow-[inset_2px_2px_6px_rgba(0,0,0,0.05),inset_-2px_-2px_6px_rgba(255,255,255,0.8),0_4px_12px_rgba(0,0,0,0.1)] backdrop-blur-sm">
-        <div className="flex h-full cursor-not-allowed items-center gap-2 border-r border-border/30 px-6 text-[15px] font-semibold text-brand-medium select-none">
-          全部
-          <span className="text-[10px]">▼</span>
-        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setScopeOpen((o) => !o);
+            setOpen(false);
+          }}
+          className="flex h-full items-center gap-1.5 border-r border-border/30 px-5 text-[15px] font-semibold text-brand-medium transition hover:text-brand-dark"
+          aria-haspopup="listbox"
+          aria-expanded={scopeOpen}
+        >
+          {scopeMeta.label}
+          <ChevronDown
+            className={cn(
+              "size-3.5 transition-transform",
+              scopeOpen && "rotate-180",
+            )}
+          />
+        </button>
         <div className="flex flex-1 items-center gap-3 px-6 text-base text-brand-dark">
           <Search className="size-4 text-brand-light" />
           <input
@@ -141,9 +187,13 @@ export function DashboardSearch() {
             onChange={(e) => {
               setQ(e.target.value);
               setOpen(true);
+              setScopeOpen(false);
             }}
-            onFocus={() => setOpen(true)}
-            placeholder="搜索知识点、计划或问题…"
+            onFocus={() => {
+              setOpen(true);
+              setScopeOpen(false);
+            }}
+            placeholder={scopeMeta.placeholder}
             className="flex-1 bg-transparent text-base font-medium placeholder:text-brand-light focus:outline-none"
           />
           {loading ? (
@@ -152,17 +202,49 @@ export function DashboardSearch() {
         </div>
       </div>
 
+      {scopeOpen ? (
+        <div
+          role="listbox"
+          className="absolute top-full left-0 z-50 mt-2 w-56 overflow-hidden rounded-2xl border border-palette-yellow-light/80 bg-white/98 shadow-[0_8px_24px_rgba(0,0,0,0.12)] backdrop-blur-sm"
+        >
+          {SCOPE_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              role="option"
+              aria-selected={opt.value === scope}
+              onClick={() => {
+                setScope(opt.value);
+                setScopeOpen(false);
+                if (debounced) setOpen(true);
+              }}
+              className={cn(
+                "flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left text-sm font-medium transition hover:bg-palette-yellow-light/30",
+                opt.value === scope
+                  ? "text-brand-dark"
+                  : "text-brand-medium",
+              )}
+            >
+              {opt.label}
+              {opt.value === scope ? (
+                <Check className="size-4 text-palette-orange" />
+              ) : null}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
       {showPanel ? (
         <div className="absolute top-full left-0 right-0 z-50 mt-2 max-h-[60vh] overflow-y-auto rounded-2xl border border-palette-yellow-light/80 bg-white/98 shadow-[0_8px_24px_rgba(0,0,0,0.12)] backdrop-blur-sm">
           {total === 0 && !loading ? (
             <div className="px-6 py-8 text-center text-sm font-medium text-brand-light">
-              没有找到与「{debounced}」相关的内容
+              没有找到与「{debounced}」相关的{scope === "all" ? "内容" : scopeMeta.label}
             </div>
           ) : null}
 
           <Section
             title="学习主题"
-            visible={results.subjects.length > 0}
+            visible={showSection("subjects") && results.subjects.length > 0}
             icon={BookOpen}
             color="text-palette-orange"
           >
@@ -185,7 +267,10 @@ export function DashboardSearch() {
 
           <Section
             title="K2V · 知识视频"
-            visible={results.knowledge_videos.length > 0}
+            visible={
+              showSection("knowledge_videos") &&
+              results.knowledge_videos.length > 0
+            }
             icon={Clapperboard}
             color="text-palette-yellow"
           >
@@ -194,7 +279,7 @@ export function DashboardSearch() {
                 key={`kv-${kv.id}`}
                 href="/k2v"
                 onClick={closeAfterNav}
-                className="flex w-full items-center gap-3 px-4 py-2.5 transition hover:bg-palette-yellow-light/30"
+                className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-palette-yellow-light/30"
               >
                 <span className="flex-1 truncate text-sm font-medium text-brand-dark">
                   {truncate(kv.prompt)}
@@ -206,7 +291,9 @@ export function DashboardSearch() {
 
           <Section
             title="C2V · 代码视频"
-            visible={results.code_videos.length > 0}
+            visible={
+              showSection("code_videos") && results.code_videos.length > 0
+            }
             icon={SearchCode}
             color="text-palette-orange"
           >
@@ -215,7 +302,7 @@ export function DashboardSearch() {
                 key={`cv-${cv.id}`}
                 href="/c2v"
                 onClick={closeAfterNav}
-                className="flex w-full items-center gap-3 px-4 py-2.5 transition hover:bg-palette-yellow-light/30"
+                className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-palette-yellow-light/30"
               >
                 <span className="flex-1 truncate text-sm font-medium text-brand-dark">
                   {truncate(cv.prompt)}
@@ -227,7 +314,10 @@ export function DashboardSearch() {
 
           <Section
             title="交互式实验室"
-            visible={results.interactive_htmls.length > 0}
+            visible={
+              showSection("interactive_htmls") &&
+              results.interactive_htmls.length > 0
+            }
             icon={FlaskConical}
             color="text-palette-blue"
           >
@@ -236,7 +326,7 @@ export function DashboardSearch() {
                 key={`ih-${ih.id}`}
                 href="/interactive"
                 onClick={closeAfterNav}
-                className="flex w-full items-center gap-3 px-4 py-2.5 transition hover:bg-palette-yellow-light/30"
+                className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-palette-yellow-light/30"
               >
                 <span className="flex-1 truncate text-sm font-medium text-brand-dark">
                   {truncate(ih.prompt)}
@@ -248,7 +338,7 @@ export function DashboardSearch() {
 
           <Section
             title="错题本"
-            visible={results.mistakes.length > 0}
+            visible={showSection("mistakes") && results.mistakes.length > 0}
             icon={BookmarkX}
             color="text-destructive"
           >
@@ -257,7 +347,7 @@ export function DashboardSearch() {
                 key={`m-${m.id}`}
                 href="/mistakes"
                 onClick={closeAfterNav}
-                className="flex w-full items-center gap-3 px-4 py-2.5 transition hover:bg-palette-yellow-light/30"
+                className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition hover:bg-palette-yellow-light/30"
               >
                 <span className="flex-1 truncate text-sm font-medium text-brand-dark">
                   {truncate(m.content)}
