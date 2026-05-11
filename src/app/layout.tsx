@@ -26,6 +26,8 @@ export const metadata: Metadata = {
   description: "AI 驱动的个性化学习伙伴",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function RootLayout({
   children,
 }: Readonly<{
