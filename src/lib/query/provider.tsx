@@ -2,14 +2,27 @@
 
 import {
   HydrationBoundary,
+  MutationCache,
+  QueryCache,
   QueryClient,
   QueryClientProvider,
   type DehydratedState,
 } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useState, type ReactNode } from "react";
+import { toast } from "sonner";
+
+import { humanizeApiError } from "@/lib/api/errors";
 
 const isServer = typeof window === "undefined";
+
+type QueryMeta = { skipErrorToast?: boolean };
+
+function notifyError(err: unknown, meta: unknown) {
+  if (isServer) return;
+  if (meta && typeof meta === "object" && (meta as QueryMeta).skipErrorToast) return;
+  toast.error(humanizeApiError(err));
+}
 
 function makeQueryClient() {
   return new QueryClient({
@@ -21,6 +34,12 @@ function makeQueryClient() {
         retry: 1,
       },
     },
+    queryCache: new QueryCache({
+      onError: (err, query) => notifyError(err, query.meta),
+    }),
+    mutationCache: new MutationCache({
+      onError: (err, _vars, _ctx, mutation) => notifyError(err, mutation.meta),
+    }),
   });
 }
 

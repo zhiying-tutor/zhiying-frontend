@@ -4,16 +4,15 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { serverFetch } from "@/lib/api/client";
-import { ApiError } from "@/lib/api/errors";
+import { ApiError, ApiSchemaError, humanizeApiError } from "@/lib/api/errors";
 import {
   problemAnswer,
   pretestConfidence,
   type PretestProblem,
 } from "@/lib/api/schemas";
+import { withApiError, type ActionResult } from "@/lib/server/action";
 
-export type SavePretestAnswerActionResult =
-  | { ok: true }
-  | { ok: false; message: string };
+export type SavePretestAnswerActionResult = ActionResult;
 
 export async function savePretestAnswerAction(
   subjectId: number,
@@ -35,7 +34,7 @@ export async function savePretestAnswerAction(
     return { ok: false, message: "请选择答案与把握程度" };
   }
 
-  try {
+  return withApiError(async () => {
     await serverFetch(
       `/study-subjects/${subjectId}/pretest/${pretestProblemId}`,
       {
@@ -46,13 +45,7 @@ export async function savePretestAnswerAction(
         },
       },
     );
-    return { ok: true };
-  } catch (err) {
-    if (err instanceof ApiError) {
-      return { ok: false, message: err.message };
-    }
-    throw err;
-  }
+  });
 }
 
 export type SubmitPretestActionResult = { ok: false; message: string };
@@ -69,8 +62,8 @@ export async function submitPretestAction(
       body: {},
     });
   } catch (err) {
-    if (err instanceof ApiError) {
-      return { ok: false, message: err.message };
+    if (err instanceof ApiError || err instanceof ApiSchemaError) {
+      return { ok: false, message: humanizeApiError(err) };
     }
     throw err;
   }

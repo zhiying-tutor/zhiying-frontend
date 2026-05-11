@@ -34,7 +34,9 @@ export interface ToolPageClientProps<T extends ToolResource> {
   ) => Promise<{ ok: true; data: T } | { ok: false; message: string }>;
   deleteAction: (
     id: number,
-  ) => Promise<{ ok: true } | { ok: false; message: string }>;
+  ) => Promise<
+    { ok: true; data?: unknown } | { ok: false; message: string }
+  >;
   consoleTitle: string;
   consoleMode: ToolConsoleMode;
   currency: "diamond" | "gold";

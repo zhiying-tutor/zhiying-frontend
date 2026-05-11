@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
 import { AUTH_COOKIE, serverFetch } from "@/lib/api/client";
-import { ApiError } from "@/lib/api/errors";
 import {
   checkinResponseSchema,
   meProfileSchema,
@@ -18,26 +17,20 @@ import {
   type StudySubject,
   type User,
 } from "@/lib/api/schemas";
+import { withApiError, type ActionResult } from "@/lib/server/action";
 
-export type CheckinActionResult =
-  | { ok: true; data: CheckinResponse }
-  | { ok: false; message: string };
+export type CheckinActionResult = ActionResult<CheckinResponse>;
 
 export async function checkinAction(): Promise<CheckinActionResult> {
-  try {
+  return withApiError(async () => {
     const data = await serverFetch<CheckinResponse>("/checkins", {
       method: "POST",
       body: {},
       schema: checkinResponseSchema,
     });
     revalidatePath("/dashboard");
-    return { ok: true, data };
-  } catch (err) {
-    if (err instanceof ApiError) {
-      return { ok: false, message: err.message };
-    }
-    throw err;
-  }
+    return data;
+  });
 }
 
 export type CreateSubjectInput = {
@@ -47,9 +40,7 @@ export type CreateSubjectInput = {
   target: string;
 };
 
-export type CreateSubjectActionResult =
-  | { ok: true; data: StudySubject }
-  | { ok: false; message: string };
+export type CreateSubjectActionResult = ActionResult<StudySubject>;
 
 export async function createSubjectAction(
   input: CreateSubjectInput,
@@ -70,7 +61,7 @@ export async function createSubjectAction(
     return { ok: false, message: "学习目标不可超过 2000 字" };
   }
 
-  try {
+  return withApiError(async () => {
     const data = await serverFetch<StudySubject>("/study-subjects", {
       method: "POST",
       body: {
@@ -82,20 +73,13 @@ export async function createSubjectAction(
       schema: studySubjectSchema,
     });
     revalidatePath("/dashboard");
-    return { ok: true, data };
-  } catch (err) {
-    if (err instanceof ApiError) {
-      return { ok: false, message: err.message };
-    }
-    throw err;
-  }
+    return data;
+  });
 }
 
 // ── Active subject ──
 
-export type SetActiveSubjectActionResult =
-  | { ok: true; data: MeProfile }
-  | { ok: false; message: string };
+export type SetActiveSubjectActionResult = ActionResult<MeProfile>;
 
 export async function setActiveSubjectAction(
   subjectId: number,
@@ -103,20 +87,15 @@ export async function setActiveSubjectAction(
   if (!Number.isInteger(subjectId) || subjectId <= 0) {
     return { ok: false, message: "无效的学习主题" };
   }
-  try {
+  return withApiError(async () => {
     const data = await serverFetch<MeProfile>("/me", {
       method: "PATCH",
       body: { active_study_subject_id: subjectId },
       schema: meProfileSchema,
     });
     revalidatePath("/dashboard");
-    return { ok: true, data };
-  } catch (err) {
-    if (err instanceof ApiError) {
-      return { ok: false, message: err.message };
-    }
-    throw err;
-  }
+    return data;
+  });
 }
 
 // ── Profile update ──
@@ -127,34 +106,25 @@ export type UpdateProfileInput = {
   introduction?: string;
 };
 
-export type UpdateProfileActionResult =
-  | { ok: true; data: MeProfile }
-  | { ok: false; message: string };
+export type UpdateProfileActionResult = ActionResult<MeProfile>;
 
 export async function updateProfileAction(
   input: UpdateProfileInput,
 ): Promise<UpdateProfileActionResult> {
-  try {
+  return withApiError(async () => {
     const data = await serverFetch<MeProfile>("/me", {
       method: "PATCH",
       body: input,
       schema: meProfileSchema,
     });
     revalidatePath("/dashboard");
-    return { ok: true, data };
-  } catch (err) {
-    if (err instanceof ApiError) {
-      return { ok: false, message: err.message };
-    }
-    throw err;
-  }
+    return data;
+  });
 }
 
 // ── Username update ──
 
-export type UpdateUsernameActionResult =
-  | { ok: true; data: User }
-  | { ok: false; message: string };
+export type UpdateUsernameActionResult = ActionResult<User>;
 
 export async function updateUsernameAction(
   username: string,
@@ -163,20 +133,15 @@ export async function updateUsernameAction(
   if (trimmed.length < 3 || trimmed.length > 32) {
     return { ok: false, message: "昵称需在 3–32 字符内" };
   }
-  try {
+  return withApiError(async () => {
     const data = await serverFetch<User>("/me/username", {
       method: "PATCH",
       body: { username: trimmed },
       schema: userSchema,
     });
     revalidatePath("/dashboard");
-    return { ok: true, data };
-  } catch (err) {
-    if (err instanceof ApiError) {
-      return { ok: false, message: err.message };
-    }
-    throw err;
-  }
+    return data;
+  });
 }
 
 // ── Logout ──

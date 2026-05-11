@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 
 import { serverFetch } from "@/lib/api/client";
-import { ApiError } from "@/lib/api/errors";
 import {
   studyQuizDetailSchema,
   type StudyQuizDetail,
 } from "@/lib/api/schemas";
+import { proxyJson } from "@/lib/server/proxy";
 
 export async function GET(
   _req: Request,
@@ -17,19 +17,9 @@ export async function GET(
     return NextResponse.json({ message: "Invalid id" }, { status: 400 });
   }
 
-  try {
-    const data = await serverFetch<StudyQuizDetail>(
-      `/study-quizzes/${id}`,
-      { schema: studyQuizDetailSchema },
-    );
-    return NextResponse.json({ data });
-  } catch (err) {
-    if (err instanceof ApiError) {
-      return NextResponse.json(
-        { message: err.message, code: err.code },
-        { status: err.status },
-      );
-    }
-    throw err;
-  }
+  return proxyJson(() =>
+    serverFetch<StudyQuizDetail>(`/study-quizzes/${id}`, {
+      schema: studyQuizDetailSchema,
+    }),
+  );
 }

@@ -99,12 +99,7 @@ export function QuizRound({
 
   const handleSelect = (letter: AnswerLetter) => {
     if (submitted || patchAnswer.isPending) return;
-    patchAnswer.mutate(
-      { problemEntryId: current.id, answer: letter },
-      {
-        onError: (e) => toast.error(e.message),
-      },
-    );
+    patchAnswer.mutate({ problemEntryId: current.id, answer: letter });
   };
 
   const handleSubmit = () => {
@@ -119,7 +114,6 @@ export function QuizRound({
         );
         setCurrentIndex(0);
       },
-      onError: (e) => toast.error(e.message),
     });
   };
 
@@ -129,7 +123,6 @@ export function QuizRound({
       onSuccess: () => {
         qc.invalidateQueries({ queryKey: meQueryKey });
       },
-      onError: (e) => toast.error(e.message),
     });
   };
 

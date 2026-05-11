@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
 import { serverFetch } from "@/lib/api/client";
-import { ApiError } from "@/lib/api/errors";
 import { knowledgeVideoSchema, type KnowledgeVideo } from "@/lib/api/schemas";
+import { proxyJson } from "@/lib/server/proxy";
 
 export async function GET(
   _req: Request,
@@ -14,21 +14,11 @@ export async function GET(
     return NextResponse.json({ message: "Invalid id" }, { status: 400 });
   }
 
-  try {
-    const data = await serverFetch<KnowledgeVideo>(
-      `/knowledge-videos/${videoId}`,
-      { schema: knowledgeVideoSchema },
-    );
-    return NextResponse.json({ data });
-  } catch (err) {
-    if (err instanceof ApiError) {
-      return NextResponse.json(
-        { message: err.message, code: err.code },
-        { status: err.status },
-      );
-    }
-    throw err;
-  }
+  return proxyJson(() =>
+    serverFetch<KnowledgeVideo>(`/knowledge-videos/${videoId}`, {
+      schema: knowledgeVideoSchema,
+    }),
+  );
 }
 
 export async function DELETE(
@@ -41,16 +31,8 @@ export async function DELETE(
     return NextResponse.json({ message: "Invalid id" }, { status: 400 });
   }
 
-  try {
+  return proxyJson(async () => {
     await serverFetch(`/knowledge-videos/${videoId}`, { method: "DELETE" });
-    return NextResponse.json({ data: { ok: true } });
-  } catch (err) {
-    if (err instanceof ApiError) {
-      return NextResponse.json(
-        { message: err.message, code: err.code },
-        { status: err.status },
-      );
-    }
-    throw err;
-  }
+    return { ok: true };
+  });
 }

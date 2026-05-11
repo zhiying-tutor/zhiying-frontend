@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { serverFetch } from "@/lib/api/client";
-import { ApiError } from "@/lib/api/errors";
+import { proxyJson } from "@/lib/server/proxy";
 
 export async function PATCH(
   _req: Request,
@@ -13,22 +13,10 @@ export async function PATCH(
     return NextResponse.json({ message: "Invalid id" }, { status: 400 });
   }
 
-  try {
-    const data = await serverFetch(
-      `/quiz-problems/${quizProblemId}/mistake-visibility`,
-      {
-        method: "PATCH",
-        body: {},
-      },
-    );
-    return NextResponse.json({ data });
-  } catch (err) {
-    if (err instanceof ApiError) {
-      return NextResponse.json(
-        { message: err.message, code: err.code },
-        { status: err.status },
-      );
-    }
-    throw err;
-  }
+  return proxyJson(() =>
+    serverFetch(`/quiz-problems/${quizProblemId}/mistake-visibility`, {
+      method: "PATCH",
+      body: {},
+    }),
+  );
 }

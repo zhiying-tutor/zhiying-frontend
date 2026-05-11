@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { AUTH_COOKIE, serverFetch } from "@/lib/api/client";
-import { ApiError } from "@/lib/api/errors";
 import { tokenSchema, userSchema, type Token } from "@/lib/api/schemas";
 import { AUTH_COOKIE_MAX_AGE } from "@/lib/auth/session";
+import { apiErrorResponse } from "@/lib/server/proxy";
 
 const bodySchema = z.object({
   username: z.string().min(3).max(32),
@@ -16,12 +16,12 @@ export async function POST(req: Request) {
   try {
     payload = await req.json();
   } catch {
-    return NextResponse.json({ message: "Invalid JSON body" }, { status: 400 });
+    return NextResponse.json({ message: "请求体不是有效 JSON" }, { status: 400 });
   }
 
   const parsed = bodySchema.safeParse(payload);
   if (!parsed.success) {
-    return NextResponse.json({ message: "Invalid registration format" }, { status: 400 });
+    return NextResponse.json({ message: "用户名或密码格式不正确" }, { status: 400 });
   }
 
   try {
@@ -49,12 +49,6 @@ export async function POST(req: Request) {
     });
     return res;
   } catch (err) {
-    if (err instanceof ApiError) {
-      return NextResponse.json(
-        { message: err.message, code: err.code },
-        { status: err.status },
-      );
-    }
-    throw err;
+    return apiErrorResponse(err);
   }
 }

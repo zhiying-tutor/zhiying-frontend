@@ -2,26 +2,15 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { serverFetch } from "@/lib/api/client";
-import { ApiError } from "@/lib/api/errors";
 import { interactiveHtmlSchema, type InteractiveHtml } from "@/lib/api/schemas";
+import { proxyJson } from "@/lib/server/proxy";
 
 const listSchema = z.array(interactiveHtmlSchema);
 
 export async function GET() {
-  try {
-    const data = await serverFetch<InteractiveHtml[]>("/interactive-htmls", {
-      schema: listSchema,
-    });
-    return NextResponse.json({ data });
-  } catch (err) {
-    if (err instanceof ApiError) {
-      return NextResponse.json(
-        { message: err.message, code: err.code },
-        { status: err.status },
-      );
-    }
-    throw err;
-  }
+  return proxyJson(() =>
+    serverFetch<InteractiveHtml[]>("/interactive-htmls", { schema: listSchema }),
+  );
 }
 
 export async function POST(req: Request) {
@@ -32,20 +21,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ message: "Invalid JSON" }, { status: 400 });
   }
 
-  try {
-    const data = await serverFetch<InteractiveHtml>("/interactive-htmls", {
+  return proxyJson(() =>
+    serverFetch<InteractiveHtml>("/interactive-htmls", {
       method: "POST",
       body: body as Record<string, unknown>,
       schema: interactiveHtmlSchema,
-    });
-    return NextResponse.json({ data });
-  } catch (err) {
-    if (err instanceof ApiError) {
-      return NextResponse.json(
-        { message: err.message, code: err.code },
-        { status: err.status },
-      );
-    }
-    throw err;
-  }
+    }),
+  );
 }
