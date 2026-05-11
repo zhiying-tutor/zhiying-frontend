@@ -1,9 +1,9 @@
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
-import { Search } from "lucide-react";
 
 import { ActiveSubjectArea } from "@/components/dashboard/active-subject-area";
 import { CreateSubjectButton } from "@/components/dashboard/create-subject-button";
 import { DashboardAside } from "@/components/dashboard/dashboard-aside";
+import { DashboardSearch } from "@/components/dashboard/dashboard-search";
 import { FeatureGrid } from "@/components/dashboard/feature-grid";
 import { PlanToolbar } from "@/components/dashboard/plan-toolbar";
 import { pickActiveSubject } from "@/lib/api/active-subject";
@@ -57,18 +57,7 @@ export default async function DashboardPage() {
               </span>
             </h1>
 
-            <div className="relative w-full max-w-[680px]">
-              <div className="flex h-[60px] items-center rounded-3xl border-2 border-palette-yellow-light bg-white/95 shadow-[inset_2px_2px_6px_rgba(0,0,0,0.05),inset_-2px_-2px_6px_rgba(255,255,255,0.8),0_4px_12px_rgba(0,0,0,0.1)] backdrop-blur-sm">
-                <div className="flex h-full cursor-not-allowed items-center gap-2 border-r border-border/30 px-6 text-[15px] font-semibold text-brand-medium select-none">
-                  全部
-                  <span className="text-[10px]">▼</span>
-                </div>
-                <div className="flex flex-1 items-center gap-3 px-6 text-base text-brand-light">
-                  <Search className="size-4" />
-                  <span className="font-medium">搜索知识点、计划或问题…</span>
-                </div>
-              </div>
-            </div>
+            <DashboardSearch />
           </header>
 
           <section className="mx-auto flex w-full max-w-[900px] flex-col gap-6">
