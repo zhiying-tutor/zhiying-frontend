@@ -2,14 +2,19 @@
 
 import {
   ArrowLeft,
+  Check,
   ChevronLeft,
   ChevronRight,
+  ClipboardList,
+  Clock,
   Eye,
   EyeOff,
   FilePen,
+  Lightbulb,
   Search,
   Star,
   X,
+  XCircle,
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -193,7 +198,13 @@ function CountBar({
             : "border-palette-yellow/40 bg-gradient-to-br from-palette-yellow-lighter to-palette-yellow-light",
         )}
       >
-        <span aria-hidden>{mode === "mistakes" ? "📝" : "⭐"}</span>
+        <span aria-hidden className="flex size-5 items-center justify-center">
+          {mode === "mistakes" ? (
+            <ClipboardList className="size-4" strokeWidth={2.2} />
+          ) : (
+            <Star className="size-4 fill-palette-orange stroke-palette-orange" strokeWidth={2} />
+          )}
+        </span>
         <span>共</span>
         <strong className="text-xl font-black">{count}</strong>
         <span>题</span>
@@ -232,8 +243,12 @@ function CardGrid({
   if (items.length === 0) {
     return (
       <div className="flex flex-col items-center gap-3 rounded-[28px] border-2 border-dashed border-border/30 bg-white/40 px-10 py-20 text-center shadow-[0_2px_6px_color-mix(in_oklch,var(--border-muted)_20%,transparent)]">
-        <div className="text-6xl drop-shadow-[0_4px_8px_color-mix(in_oklch,var(--palette-orange)_30%,transparent)]">
-          {mode === "mistakes" ? "📝" : "⭐"}
+        <div className="flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-palette-yellow-light to-palette-orange-mist text-palette-orange shadow-[0_4px_12px_color-mix(in_oklch,var(--palette-orange)_25%,transparent)] [filter:drop-shadow(0_4px_8px_color-mix(in_oklch,var(--palette-orange)_25%,transparent))]">
+          {mode === "mistakes" ? (
+            <ClipboardList className="size-8" strokeWidth={1.6} />
+          ) : (
+            <Star className="size-8 fill-palette-orange stroke-palette-orange" strokeWidth={1.6} />
+          )}
         </div>
         <p className="text-lg font-extrabold text-brand-dark">{emptyHint}</p>
       </div>
@@ -316,13 +331,17 @@ function Card({
       <div className="flex items-start justify-between gap-3">
         <div
           className={cn(
-            "flex size-10 shrink-0 items-center justify-center rounded-[14px] text-xl shadow-[0_2px_8px_color-mix(in_oklch,var(--border-muted)_25%,transparent)]",
+            "flex size-10 shrink-0 items-center justify-center rounded-[14px] shadow-[0_2px_8px_color-mix(in_oklch,var(--border-muted)_25%,transparent)]",
             mode === "mistakes"
-              ? "bg-gradient-to-br from-palette-orange-mist to-palette-orange-lighter"
-              : "bg-gradient-to-br from-palette-yellow-lighter to-palette-yellow-light",
+              ? "bg-gradient-to-br from-palette-orange-mist to-palette-orange-lighter text-destructive"
+              : "bg-gradient-to-br from-palette-yellow-lighter to-palette-yellow-light text-palette-orange",
           )}
         >
-          {mode === "mistakes" ? "❌" : "⭐"}
+          {mode === "mistakes" ? (
+            <XCircle className="size-5" strokeWidth={2} />
+          ) : (
+            <Star className="size-5 fill-palette-orange stroke-palette-orange" strokeWidth={1.8} />
+          )}
         </div>
       </div>
 
@@ -340,7 +359,10 @@ function Card({
       </div>
 
       <div className="mt-auto flex items-center justify-between border-t border-dashed border-border/25 pt-3 text-xs font-semibold text-brand-light">
-        <span>🕐 {formatTime(item.created_at)}</span>
+        <span className="inline-flex items-center gap-1">
+          <Clock className="size-3.5" strokeWidth={2} />
+          {formatTime(item.created_at)}
+        </span>
         {mode === "mistakes" ? (
           <span
             role="button"
@@ -506,12 +528,14 @@ function DetailDialog({
                       {text}
                     </span>
                     {isCorrect ? (
-                      <span className="shrink-0 rounded-lg bg-palette-green-lighter px-3 py-0.5 text-[13px] font-bold text-palette-green">
-                        ✓ 正确答案
+                      <span className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-palette-green-lighter px-3 py-0.5 text-[13px] font-bold text-palette-green">
+                        <Check className="size-3.5" strokeWidth={3} />
+                        正确答案
                       </span>
                     ) : isUserWrong ? (
-                      <span className="shrink-0 rounded-lg bg-danger-surface px-3 py-0.5 text-[13px] font-bold text-destructive">
-                        ✗ 你的选择
+                      <span className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-danger-surface px-3 py-0.5 text-[13px] font-bold text-destructive">
+                        <X className="size-3.5" strokeWidth={3} />
+                        你的选择
                       </span>
                     ) : null}
                   </div>
@@ -521,15 +545,19 @@ function DetailDialog({
 
             {item.explanation ? (
               <div className="rounded-2xl bg-palette-yellow-mist/60 p-4 text-sm leading-relaxed text-brand-dark">
-                <div className="mb-1 text-xs font-bold text-brand-medium">
-                  💡 解析
+                <div className="mb-1 inline-flex items-center gap-1 text-xs font-bold text-brand-medium">
+                  <Lightbulb className="size-3.5" strokeWidth={2.2} />
+                  解析
                 </div>
                 <p style={{ whiteSpace: "pre-wrap" }}>{item.explanation}</p>
               </div>
             ) : null}
 
             <div className="flex items-center gap-4 border-t border-dashed border-border/25 pt-4 text-xs font-semibold text-brand-light">
-              <span>🕐 {formatTime(item.created_at)}</span>
+              <span className="inline-flex items-center gap-1">
+                <Clock className="size-3.5" strokeWidth={2} />
+                {formatTime(item.created_at)}
+              </span>
             </div>
           </div>
         )}

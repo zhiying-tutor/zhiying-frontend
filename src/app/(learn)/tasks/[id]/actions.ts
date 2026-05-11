@@ -20,30 +20,19 @@ export type CreateInteractiveHtmlActionResult =
 export type CreateStudyQuizActionResult = ActionResult<CreateStudyQuizResponse>;
 export type CompleteTaskActionResult = ActionResult;
 
-function validatePrompt(prompt: string): string | null {
-  const trimmed = prompt.trim();
-  if (trimmed.length < 1) return "请填写生成提示词";
-  if (trimmed.length > 2000) return "提示词不可超过 2000 字";
-  return null;
-}
-
 export async function createKnowledgeVideoAction(
   taskId: number,
-  prompt: string,
 ): Promise<CreateKnowledgeVideoActionResult> {
   if (!Number.isInteger(taskId) || taskId <= 0) {
     return { ok: false, message: "无效的任务" };
   }
-  const trimmed = prompt.trim();
-  const err = validatePrompt(trimmed);
-  if (err) return { ok: false, message: err };
 
   return withApiError(async () => {
     const data = await serverFetch<CreateKnowledgeVideoResponse>(
       `/study-tasks/${taskId}/knowledge-video`,
       {
         method: "POST",
-        body: { prompt: trimmed },
+        body: {},
         schema: createKnowledgeVideoResponseSchema,
       },
     );
@@ -54,21 +43,17 @@ export async function createKnowledgeVideoAction(
 
 export async function createInteractiveHtmlAction(
   taskId: number,
-  prompt: string,
 ): Promise<CreateInteractiveHtmlActionResult> {
   if (!Number.isInteger(taskId) || taskId <= 0) {
     return { ok: false, message: "无效的任务" };
   }
-  const trimmed = prompt.trim();
-  const err = validatePrompt(trimmed);
-  if (err) return { ok: false, message: err };
 
   return withApiError(async () => {
     const data = await serverFetch<CreateInteractiveHtmlResponse>(
       `/study-tasks/${taskId}/interactive-html`,
       {
         method: "POST",
-        body: { prompt: trimmed },
+        body: {},
         schema: createInteractiveHtmlResponseSchema,
       },
     );
@@ -79,21 +64,17 @@ export async function createInteractiveHtmlAction(
 
 export async function createStudyQuizAction(
   taskId: number,
-  prompt: string,
 ): Promise<CreateStudyQuizActionResult> {
   if (!Number.isInteger(taskId) || taskId <= 0) {
     return { ok: false, message: "无效的任务" };
   }
-  const trimmed = prompt.trim();
-  const err = validatePrompt(trimmed);
-  if (err) return { ok: false, message: err };
 
   return withApiError(async () => {
     const data = await serverFetch<CreateStudyQuizResponse>(
       `/study-tasks/${taskId}/quizzes`,
       {
         method: "POST",
-        body: { prompt: trimmed },
+        body: {},
         schema: createStudyQuizResponseSchema,
       },
     );

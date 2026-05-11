@@ -1,5 +1,6 @@
 "use client";
 
+import { GraduationCap } from "lucide-react";
 import { useId, useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -127,8 +128,8 @@ export function ProfileEditDialog({
 
         <div className="flex flex-col gap-6 px-10 pt-8 pb-10">
           <DialogHeader className="items-center text-center">
-            <div className="mb-2 flex size-16 items-center justify-center rounded-[20px] bg-gradient-to-br from-palette-yellow-lighter to-palette-yellow text-[28px] shadow-[var(--shadow-soft)]">
-              🧑‍🎓
+            <div className="mb-2 flex size-16 items-center justify-center rounded-[20px] bg-gradient-to-br from-palette-yellow-lighter to-palette-yellow text-palette-orange shadow-[var(--shadow-soft)]">
+              <GraduationCap className="size-9" strokeWidth={1.6} />
             </div>
             <DialogTitle className="text-[26px] font-extrabold tracking-tight text-brand-deep">
               完善个人信息

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { BookOpen, Coins, Crown, Flame, Gem, LogOut } from "lucide-react";
+import { BookOpen, Coins, Crown, Flame, Gem, GraduationCap, LogOut, Pencil } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { logoutAction } from "@/app/(app)/dashboard/actions";
@@ -49,7 +49,7 @@ export function DashboardAside({
             className="relative z-10 mb-4 flex w-full items-center justify-between rounded-xl border border-dashed border-palette-orange-light bg-white/80 px-3 py-2 shadow-[0_2px_4px_color-mix(in_oklch,var(--palette-orange)_10%,transparent)]"
           >
             <div className="flex items-center gap-2">
-              <span className="text-base">✏️</span>
+              <Pencil className="size-3.5 text-palette-orange" strokeWidth={2.2} />
               <span className="text-xs font-semibold text-brand-dark">
                 完善个人信息
               </span>
@@ -66,8 +66,8 @@ export function DashboardAside({
           className="relative z-10 mb-4 flex size-[84px] cursor-pointer items-center justify-center rounded-[28px] bg-canvas shadow-[0_8px_16px_color-mix(in_oklch,var(--color-border-muted)_20%,transparent)]"
           aria-label="编辑个人资料"
         >
-          <div className="flex size-[60px] items-center justify-center overflow-hidden rounded-[18px] bg-palette-yellow-light text-3xl">
-            🧑‍🎓
+          <div className="flex size-[60px] items-center justify-center overflow-hidden rounded-[18px] bg-palette-yellow-light text-palette-orange">
+            <GraduationCap className="size-8" strokeWidth={1.6} />
           </div>
         </button>
 

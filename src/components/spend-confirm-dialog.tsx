@@ -1,6 +1,7 @@
 "use client";
 
-import { type ReactNode } from "react";
+import { AlertTriangle, ArrowRight, Coins, Gem } from "lucide-react";
+import type { ComponentType, ReactNode, SVGProps } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -16,21 +17,30 @@ export type SpendCurrency = "diamond" | "gold";
 
 const CURRENCY_META: Record<
   SpendCurrency,
-  { icon: string; label: string; chipBg: string; chipText: string; afterBg: string }
+  {
+    Icon: ComponentType<SVGProps<SVGSVGElement>>;
+    label: string;
+    chipBg: string;
+    chipText: string;
+    afterBg: string;
+    iconColor: string;
+  }
 > = {
   diamond: {
-    icon: "💎",
+    Icon: Gem,
     label: "钻石",
     chipBg: "bg-palette-blue-mist",
     chipText: "text-palette-blue",
     afterBg: "bg-palette-blue-mist/60",
+    iconColor: "stroke-palette-blue",
   },
   gold: {
-    icon: "🪙",
+    Icon: Coins,
     label: "金币",
     chipBg: "bg-palette-yellow-light",
     chipText: "text-palette-orange",
     afterBg: "bg-palette-yellow-light/60",
+    iconColor: "stroke-palette-orange",
   },
 };
 
@@ -66,6 +76,7 @@ export function SpendConfirmDialog({
   onConfirm,
 }: SpendConfirmDialogProps) {
   const meta = CURRENCY_META[currency];
+  const Icon = meta.Icon;
   const after = currentBalance - amount;
   const insufficient = after < 0;
 
@@ -73,8 +84,8 @@ export function SpendConfirmDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader className="items-center text-center">
-          <div className="mb-3 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-palette-yellow-light to-palette-orange-lighter text-3xl shadow-[0_4px_12px_color-mix(in_oklch,var(--palette-orange)_20%,transparent)]">
-            {meta.icon}
+          <div className={`mb-3 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-palette-yellow-light to-palette-orange-lighter shadow-[0_4px_12px_color-mix(in_oklch,var(--palette-orange)_20%,transparent)] ${meta.chipText}`}>
+            <Icon className="size-8" strokeWidth={1.8} />
           </div>
           <DialogTitle className="text-lg font-extrabold text-brand-dark">
             {title}
@@ -90,7 +101,7 @@ export function SpendConfirmDialog({
           <div
             className={`flex items-center justify-center gap-2 rounded-2xl ${meta.chipBg} px-5 py-3`}
           >
-            <span className="text-xl">{meta.icon}</span>
+            <Icon className={`size-5 ${meta.iconColor}`} strokeWidth={2.2} />
             <span className={`text-2xl font-black ${meta.chipText}`}>
               -{amount}
             </span>
@@ -105,8 +116,8 @@ export function SpendConfirmDialog({
             }`}
           >
             <span>操作后余额</span>
-            <span>➜</span>
-            <span>{meta.icon}</span>
+            <ArrowRight className="size-3.5" strokeWidth={2.4} />
+            <Icon className={`size-3.5 ${meta.iconColor}`} strokeWidth={2.2} />
             <span className="text-base font-black">{after}</span>
           </div>
 
@@ -117,8 +128,9 @@ export function SpendConfirmDialog({
           ) : null}
 
           {insufficient ? (
-            <div className="rounded-2xl bg-danger-surface px-4 py-2 text-center text-xs font-semibold text-destructive">
-              ⚠️ 余额不足，还差 {Math.abs(after)} {meta.label}
+            <div className="inline-flex items-center justify-center gap-1 rounded-2xl bg-danger-surface px-4 py-2 text-center text-xs font-semibold text-destructive">
+              <AlertTriangle className="size-3.5" strokeWidth={2.4} />
+              余额不足，还差 {Math.abs(after)} {meta.label}
             </div>
           ) : null}
         </div>
@@ -136,7 +148,16 @@ export function SpendConfirmDialog({
             disabled={loading || insufficient}
             className="bg-gradient-to-br from-palette-yellow to-palette-orange font-bold text-brand-dark hover:opacity-90"
           >
-            {loading ? "处理中…" : (confirmText ?? `${meta.icon} 确认消耗`)}
+            {loading ? (
+              "处理中…"
+            ) : confirmText ? (
+              confirmText
+            ) : (
+              <>
+                <Icon className="size-4" strokeWidth={2.2} />
+                确认消耗
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

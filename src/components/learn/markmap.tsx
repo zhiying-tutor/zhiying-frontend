@@ -29,5 +29,10 @@ export function MarkmapView({ markdown }: { markdown: string }) {
     };
   }, [markdown]);
 
-  return <svg ref={svgRef} className="h-full w-full" />;
+  return (
+    <svg
+      ref={svgRef}
+      className="h-full w-full [&_.markmap-foreign]:!font-[400] [&_.markmap-foreign]:!text-[10px] [&_.markmap-foreign]:!leading-[1.3]"
+    />
+  );
 }

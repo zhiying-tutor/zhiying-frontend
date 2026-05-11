@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { ClipboardCheck, Plus } from "lucide-react";
+import { ClipboardCheck, NotebookPen, Plus, Rocket } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { ContentCard } from "@/components/learn/content-card";
@@ -113,7 +113,10 @@ export function QuizSection({
             </div>
           ) : sorted.length === 0 ? (
             <div className="flex flex-col items-center gap-3 py-6 text-center">
-              <div className="text-4xl">📝</div>
+              <NotebookPen
+                className="size-10 stroke-palette-orange [filter:drop-shadow(0_4px_12px_color-mix(in_oklch,var(--palette-orange)_30%,transparent))]"
+                strokeWidth={1.6}
+              />
               <h3 className="text-base font-extrabold text-brand-dark">
                 完成学习后，来检验一下掌握程度吧！
               </h3>
@@ -126,9 +129,10 @@ export function QuizSection({
               <button
                 type="button"
                 onClick={() => setDialogOpen(true)}
-                className="rounded-full bg-gradient-to-br from-palette-yellow to-palette-orange px-7 py-2 text-base font-bold text-brand-dark shadow-[0_4px_16px_color-mix(in_oklch,var(--palette-orange)_35%,transparent)] hover:opacity-90"
+                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-palette-yellow to-palette-orange px-7 py-2 text-base font-bold text-brand-dark shadow-[0_4px_16px_color-mix(in_oklch,var(--palette-orange)_35%,transparent)] hover:opacity-90"
               >
-                🚀 开始测验
+                <Rocket className="size-4" strokeWidth={2.2} />
+                <span>开始测验</span>
               </button>
             </div>
           ) : (

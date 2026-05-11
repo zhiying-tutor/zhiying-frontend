@@ -1,6 +1,7 @@
 "use client";
 
-import { Loader2, RotateCcw, Sparkles } from "lucide-react";
+import { Coins, Gem, Loader2, RotateCcw, Sparkles } from "lucide-react";
+import type { ComponentType, SVGProps } from "react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -28,10 +29,13 @@ export interface ToolConsoleProps {
   onSuccess: (id: number) => void;
 }
 
-const CURRENCY_META = {
-  diamond: { icon: "💎", label: "钻石" },
-  gold: { icon: "🪙", label: "金币" },
-} as const;
+const CURRENCY_META: Record<
+  "diamond" | "gold",
+  { Icon: ComponentType<SVGProps<SVGSVGElement>>; label: string }
+> = {
+  diamond: { Icon: Gem, label: "钻石" },
+  gold: { Icon: Coins, label: "金币" },
+};
 
 export function ToolConsole({
   title,
@@ -163,7 +167,7 @@ export function ToolConsole({
                   : "bg-palette-yellow-light text-palette-orange"
             }`}
           >
-            <span className="text-sm">{meta.icon}</span>
+            <meta.Icon className="size-3.5" strokeWidth={2.2} />
             {insufficient
               ? `余额不足，还差 ${Math.abs(after)}`
               : `每次消耗 ${cost} · 余额 ${currentBalance}`}

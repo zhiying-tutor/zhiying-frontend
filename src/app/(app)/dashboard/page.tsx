@@ -1,4 +1,5 @@
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
+import { Rocket } from "lucide-react";
 
 import { ActiveSubjectArea } from "@/components/dashboard/active-subject-area";
 import { CreateSubjectButton } from "@/components/dashboard/create-subject-button";
@@ -96,8 +97,8 @@ function EmptyState({
 }) {
   return (
     <div className="mx-auto flex max-w-[680px] flex-col items-center rounded-[28px] border-2 border-dashed border-border/25 bg-white/60 px-10 py-16 text-center shadow-[var(--shadow-soft)]">
-      <div className="mb-6 text-6xl drop-shadow-[0_4px_8px_color-mix(in_oklch,var(--palette-orange)_30%,transparent)]">
-        🚀
+      <div className="mb-6 flex size-20 items-center justify-center rounded-full bg-gradient-to-br from-palette-yellow-light to-palette-orange-light text-palette-orange shadow-[0_4px_12px_color-mix(in_oklch,var(--palette-orange)_30%,transparent)]">
+        <Rocket className="size-10" strokeWidth={1.6} />
       </div>
       <h2 className="mb-3 text-2xl font-extrabold text-brand-dark">
         还没有学习计划
@@ -108,7 +109,7 @@ function EmptyState({
       <CreateSubjectButton
         pricing={pricing}
         currentDiamond={currentDiamond}
-        label="🚀 创建第一个学习计划"
+        label="创建第一个学习计划"
       />
     </div>
   );

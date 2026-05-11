@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Package } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -163,7 +164,9 @@ export function ToolPageClient<T extends ToolResource>({
 
         {list.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 rounded-3xl border-2 border-dashed border-border/30 bg-white/50 px-8 py-16 text-center">
-            <div className="text-5xl">📦</div>
+            <div className="flex size-16 items-center justify-center rounded-2xl bg-palette-yellow-light text-palette-orange">
+              <Package className="size-9" strokeWidth={1.6} />
+            </div>
             <p className="max-w-md text-sm font-medium text-brand-medium">
               {emptyHint}
             </p>

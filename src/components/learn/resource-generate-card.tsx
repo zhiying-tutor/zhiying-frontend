@@ -1,7 +1,7 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { Box, Film, Sparkles } from "lucide-react";
+import { Box, Coins, Film, Gem, Sparkles } from "lucide-react";
 import { useState, useTransition, type ReactNode } from "react";
 import { toast } from "sonner";
 
@@ -11,7 +11,6 @@ import {
 } from "@/app/(learn)/tasks/[id]/actions";
 import { SpendConfirmDialog } from "@/components/spend-confirm-dialog";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import type { StudyTaskStatus } from "@/lib/api/schemas";
 import { useConfig } from "@/lib/query/config";
 import { meQueryKey } from "@/lib/query/keys";
@@ -27,13 +26,12 @@ type KindMeta = {
   subtitle: string;
   icon: ReactNode;
   tagline: string;
-  placeholder: string;
   innerBorder: string;
   innerBg: string;
   innerShadow: string;
   iconShadow: string;
   currency: "diamond" | "gold";
-  currencyEmoji: string;
+  currencyIcon: ReactNode;
 };
 
 const META: Record<Kind, KindMeta> = {
@@ -42,8 +40,7 @@ const META: Record<Kind, KindMeta> = {
     title: "沉浸视界",
     subtitle: "知识点视频化解析",
     icon: <Film />,
-    tagline: "描述你想看的内容，AI 即刻生成",
-    placeholder: "例如：用动画演示二叉树的前序遍历过程",
+    tagline: "AI 将基于本任务自动生成讲解视频",
     innerBorder:
       "border border-[color-mix(in_oklch,var(--palette-blue-light)_30%,transparent)]",
     innerBg: "bg-gradient-to-br from-palette-blue-lighter to-palette-blue-mist",
@@ -51,15 +48,14 @@ const META: Record<Kind, KindMeta> = {
     iconShadow:
       "[filter:drop-shadow(0_4px_12px_color-mix(in_oklch,var(--palette-blue)_30%,transparent))]",
     currency: "diamond",
-    currencyEmoji: "💎",
+    currencyIcon: <Gem className="size-4" strokeWidth={2.2} />,
   },
   "interactive-html": {
     theme: "green",
     title: "具身交互沙盒",
     subtitle: "全沉浸可交互环境",
     icon: <Box />,
-    tagline: "描述你想要的交互场景，AI 即刻搭建",
-    placeholder: "例如：可视化地展示快速排序的分区过程，可拖拽修改输入数组",
+    tagline: "AI 将基于本任务自动搭建交互场景",
     innerBorder:
       "border border-[color-mix(in_oklch,var(--palette-green-light)_50%,transparent)]",
     innerBg:
@@ -68,7 +64,7 @@ const META: Record<Kind, KindMeta> = {
     iconShadow:
       "[filter:drop-shadow(0_4px_12px_color-mix(in_oklch,var(--palette-green)_30%,transparent))]",
     currency: "gold",
-    currencyEmoji: "🪙",
+    currencyIcon: <Coins className="size-4" strokeWidth={2.2} />,
   },
 };
 
@@ -86,7 +82,6 @@ export function ResourceGenerateCard({
   const me = useMe();
   const queryClient = useQueryClient();
 
-  const [prompt, setPrompt] = useState("");
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -97,8 +92,7 @@ export function ResourceGenerateCard({
   const balance =
     kind === "knowledge-video" ? (me?.diamond ?? 0) : (me?.gold ?? 0);
   const locked = taskStatus === "LOCKED";
-  const trimmedPrompt = prompt.trim();
-  const submitDisabled = trimmedPrompt.length === 0 || locked || isPending;
+  const submitDisabled = locked || isPending;
 
   const onConfirm = () => {
     startTransition(async () => {
@@ -106,12 +100,11 @@ export function ResourceGenerateCard({
         kind === "knowledge-video"
           ? createKnowledgeVideoAction
           : createInteractiveHtmlAction;
-      const result = await action(taskId, trimmedPrompt);
+      const result = await action(taskId);
       if (result.ok) {
         toast.success("已加入生成队列，请稍候");
         queryClient.invalidateQueries({ queryKey: meQueryKey });
         setConfirmOpen(false);
-        setPrompt("");
       } else {
         toast.error(result.message);
       }
@@ -138,24 +131,20 @@ export function ResourceGenerateCard({
             strokeWidth={1.6}
           />
           <p className="text-sm font-bold text-brand-medium">{meta.tagline}</p>
-          <Textarea
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            placeholder={meta.placeholder}
-            rows={3}
-            maxLength={2000}
-            disabled={locked || isPending}
-            className="w-full max-w-[640px] resize-none rounded-2xl border border-white/70 bg-white/70 text-sm font-medium text-brand-dark shadow-[inset_0_2px_4px_rgba(0,0,0,0.04)] placeholder:text-brand-light"
-          />
           <Button
             type="button"
             disabled={submitDisabled}
             onClick={() => setConfirmOpen(true)}
-            className="bg-gradient-to-br from-palette-yellow to-palette-orange px-7 py-2 text-base font-bold text-brand-dark shadow-[0_4px_16px_color-mix(in_oklch,var(--palette-orange)_35%,transparent)] hover:opacity-90"
+            className="inline-flex items-center gap-2 bg-gradient-to-br from-palette-yellow to-palette-orange px-7 py-2 text-base font-bold text-brand-dark shadow-[0_4px_16px_color-mix(in_oklch,var(--palette-orange)_35%,transparent)] hover:opacity-90"
           >
-            {locked
-              ? "请先完成前置任务"
-              : `生成 · -${amount} ${meta.currencyEmoji}`}
+            {locked ? (
+              "请先完成前置任务"
+            ) : (
+              <>
+                <span>生成 · -{amount}</span>
+                {meta.currencyIcon}
+              </>
+            )}
           </Button>
         </div>
       </div>
@@ -164,7 +153,7 @@ export function ResourceGenerateCard({
         open={confirmOpen}
         onOpenChange={setConfirmOpen}
         title={`生成${meta.title}`}
-        description={`将根据提示词生成${meta.title}，确认消耗`}
+        description={`将根据本任务自动生成${meta.title}，确认消耗`}
         currency={meta.currency}
         amount={amount}
         currentBalance={balance}

@@ -1,5 +1,6 @@
 "use client";
 
+import { AlertTriangle, ArrowRight, Gem, Rocket } from "lucide-react";
 import { useId, useState, useTransition } from "react";
 import { toast } from "sonner";
 
@@ -48,14 +49,14 @@ export function CreateSubjectButton({
   currentDiamond,
   variant = "primary",
   className,
-  label = "🚀 创建第一个学习计划",
+  label = "创建第一个学习计划",
 }: CreateSubjectButtonProps) {
   const [open, setOpen] = useState(false);
 
   const baseClass =
     variant === "primary"
-      ? "flex h-[52px] items-center gap-2 rounded-full bg-gradient-to-br from-palette-yellow to-palette-orange px-9 text-base font-bold text-brand-dark shadow-[0_4px_16px_color-mix(in_oklch,var(--palette-orange)_35%,transparent)] transition-transform hover:-translate-y-0.5"
-      : "flex h-10 items-center gap-2 rounded-full border border-palette-orange/40 bg-white/70 px-5 text-sm font-bold text-brand-dark hover:bg-palette-yellow-light";
+      ? "inline-flex h-[52px] items-center gap-2 rounded-full bg-gradient-to-br from-palette-yellow to-palette-orange px-9 text-base font-bold text-brand-dark shadow-[0_4px_16px_color-mix(in_oklch,var(--palette-orange)_35%,transparent)] transition-transform hover:-translate-y-0.5"
+      : "inline-flex h-10 items-center gap-2 rounded-full border border-palette-orange/40 bg-white/70 px-5 text-sm font-bold text-brand-dark hover:bg-palette-yellow-light";
 
   return (
     <>
@@ -64,6 +65,7 @@ export function CreateSubjectButton({
         onClick={() => setOpen(true)}
         className={`${baseClass} ${className ?? ""}`}
       >
+        <Rocket className="size-4" strokeWidth={2.2} />
         {label}
       </button>
       {open ? (
@@ -143,8 +145,8 @@ function CreateSubjectModal({
         {step === "form" ? (
           <>
             <DialogHeader className="items-center text-center">
-              <div className="mb-3 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-palette-yellow-light to-palette-orange-lighter text-3xl">
-                🚀
+              <div className="mb-3 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-palette-yellow-light to-palette-orange-lighter text-palette-orange shadow-[0_4px_12px_color-mix(in_oklch,var(--palette-orange)_20%,transparent)]">
+                <Rocket className="size-8" strokeWidth={1.8} />
               </div>
               <DialogTitle className="text-lg font-extrabold text-brand-dark">
                 创建学习主题
@@ -211,8 +213,9 @@ function CreateSubjectModal({
                         <span className="text-base font-black text-brand-dark">
                           {p.total_stages} 阶段
                         </span>
-                        <span className="flex items-center gap-1 text-sm font-bold text-palette-blue">
-                          💎 {p.diamond_cost}
+                        <span className="inline-flex items-center gap-1 text-sm font-bold text-palette-blue">
+                          <Gem className="size-3.5" strokeWidth={2.2} />
+                          {p.diamond_cost}
                         </span>
                       </button>
                     );
@@ -251,8 +254,8 @@ function CreateSubjectModal({
         ) : (
           <>
             <DialogHeader className="items-center text-center">
-              <div className="mb-3 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-palette-yellow-light to-palette-orange-lighter text-3xl">
-                💎
+              <div className="mb-3 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br from-palette-yellow-light to-palette-orange-lighter text-palette-blue shadow-[0_4px_12px_color-mix(in_oklch,var(--palette-orange)_20%,transparent)]">
+                <Gem className="size-8" strokeWidth={1.8} />
               </div>
               <DialogTitle className="text-lg font-extrabold text-brand-dark">
                 确认开启学习计划？
@@ -264,7 +267,7 @@ function CreateSubjectModal({
 
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-center gap-2 rounded-2xl bg-palette-blue-mist px-5 py-3">
-                <span className="text-xl">💎</span>
+                <Gem className="size-5 stroke-palette-blue" strokeWidth={2.2} />
                 <span className="text-2xl font-black text-palette-blue">-{cost}</span>
                 <span className="text-sm font-semibold text-brand-medium">钻石消耗</span>
               </div>
@@ -274,13 +277,14 @@ function CreateSubjectModal({
                 }`}
               >
                 <span>操作后余额</span>
-                <span>➜</span>
-                <span>💎</span>
+                <ArrowRight className="size-3.5" strokeWidth={2.4} />
+                <Gem className="size-3.5 stroke-palette-blue" strokeWidth={2.2} />
                 <span className="text-base font-black">{after}</span>
               </div>
               {insufficient ? (
-                <div className="rounded-2xl bg-danger-surface px-4 py-2 text-center text-xs font-semibold text-destructive">
-                  ⚠️ 钻石不足，还差 {Math.abs(after)}
+                <div className="inline-flex items-center justify-center gap-1 rounded-2xl bg-danger-surface px-4 py-2 text-center text-xs font-semibold text-destructive">
+                  <AlertTriangle className="size-3.5" strokeWidth={2.4} />
+                  钻石不足，还差 {Math.abs(after)}
                 </div>
               ) : (
                 <div className="rounded-2xl bg-palette-yellow-light px-4 py-2 text-center text-xs font-semibold text-brand-dark">
@@ -302,7 +306,14 @@ function CreateSubjectModal({
                 disabled={isPending || insufficient}
                 className="bg-gradient-to-br from-palette-yellow to-palette-orange font-bold text-brand-dark hover:opacity-90"
               >
-                {isPending ? "创建中…" : "💎 确认开启"}
+                {isPending ? (
+                  "创建中…"
+                ) : (
+                  <>
+                    <Gem className="size-4" strokeWidth={2.2} />
+                    确认开启
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </>

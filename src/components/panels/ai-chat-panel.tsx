@@ -1,11 +1,11 @@
-import { Send } from "lucide-react";
+import { Bot, Send } from "lucide-react";
 
 export function AiChatPanel() {
   return (
     <div className="relative flex flex-1 flex-col overflow-hidden px-5 py-6">
       <div className="mb-5 flex items-center gap-2.5">
-        <div className="flex size-8 items-center justify-center rounded-xl bg-palette-orange-mist text-lg shadow-[0_4px_8px_color-mix(in_oklch,var(--palette-orange)_30%,transparent)]">
-          🤖
+        <div className="flex size-8 items-center justify-center rounded-xl bg-palette-orange-mist text-palette-orange shadow-[0_4px_8px_color-mix(in_oklch,var(--palette-orange)_30%,transparent)]">
+          <Bot className="size-5" strokeWidth={2} />
         </div>
         <h4 className="text-base font-extrabold text-brand-dark">AI 伴学</h4>
       </div>

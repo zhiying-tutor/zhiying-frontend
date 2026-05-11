@@ -1,5 +1,6 @@
 "use client";
 
+import { BookOpen } from "lucide-react";
 import { useEffect } from "react";
 import Link from "next/link";
 
@@ -21,7 +22,9 @@ export default function LearnError({
 
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center gap-6 bg-canvas px-6 py-12 text-center">
-      <div className="text-6xl">📚</div>
+      <div className="flex size-20 items-center justify-center rounded-full bg-palette-yellow-light text-palette-orange">
+        <BookOpen className="size-10" strokeWidth={1.6} />
+      </div>
       <div className="space-y-2">
         <h2 className="text-2xl font-extrabold text-brand-dark">学习页加载失败</h2>
         <p className="max-w-md text-sm leading-relaxed text-brand-medium">

@@ -1,6 +1,18 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Loader2, Star, XCircle } from "lucide-react";
+import type { ComponentType, SVGProps } from "react";
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  ClipboardList,
+  Lightbulb,
+  Loader2,
+  Rocket,
+  Star,
+  X,
+  XCircle,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -223,27 +235,34 @@ export function QuizRound({
 
           let stateClass =
             "border-palette-yellow-light/80 bg-white hover:-translate-y-0.5 hover:border-palette-orange/60 hover:bg-palette-orange-lighter/20";
-          let badge: { label: string; className: string } | null = null;
+          let badge: {
+            label: string;
+            Icon: ComponentType<SVGProps<SVGSVGElement>>;
+            className: string;
+          } | null = null;
 
           if (submitted) {
             if (isSelected && isCorrect) {
               stateClass =
                 "border-palette-green bg-palette-green-lighter/40";
               badge = {
-                label: "✅ 回答正确",
+                label: "回答正确",
+                Icon: Check,
                 className: "bg-palette-green-lighter text-palette-green",
               };
             } else if (isSelected && !isCorrect) {
               stateClass = "border-destructive bg-danger-surface/40";
               badge = {
-                label: "❌ 你的答案",
+                label: "你的答案",
+                Icon: X,
                 className: "bg-danger-surface text-destructive",
               };
             } else if (!isSelected && isCorrect) {
               stateClass =
                 "border-palette-green/60 bg-palette-green-lighter/30";
               badge = {
-                label: "💡 正确答案",
+                label: "正确答案",
+                Icon: Lightbulb,
                 className: "bg-palette-green-lighter text-palette-green",
               };
             } else {
@@ -285,10 +304,11 @@ export function QuizRound({
               {badge ? (
                 <span
                   className={cn(
-                    "ml-auto rounded-full px-2.5 py-0.5 text-xs font-bold",
+                    "ml-auto inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold",
                     badge.className,
                   )}
                 >
+                  <badge.Icon className="size-3" strokeWidth={3} />
                   {badge.label}
                 </span>
               ) : null}
@@ -306,11 +326,19 @@ export function QuizRound({
             onClick={handleSubmit}
             className="rounded-full bg-gradient-to-br from-palette-yellow to-palette-orange px-8 font-bold text-brand-dark hover:opacity-90"
           >
-            {submitQuiz.isPending
-              ? "提交中…"
-              : allAnswered
-                ? "🚀 提交答案"
-                : `📝 还有 ${total - answeredCount} 题未答`}
+            {submitQuiz.isPending ? (
+              "提交中…"
+            ) : allAnswered ? (
+              <>
+                <Rocket className="size-4" strokeWidth={2.2} />
+                提交答案
+              </>
+            ) : (
+              <>
+                <ClipboardList className="size-4" strokeWidth={2.2} />
+                还有 {total - answeredCount} 题未答
+              </>
+            )}
           </Button>
         </div>
       )}
