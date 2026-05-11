@@ -6,6 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { logoutAction } from "@/app/(app)/dashboard/actions";
 import { CheckinButton } from "@/components/dashboard/checkin-button";
+import { HandbookDialog } from "@/components/dashboard/handbook-dialog";
 import { ProfileEditDialog } from "@/components/dashboard/profile-edit-dialog";
 import { AiChatPanel } from "@/components/panels/ai-chat-panel";
 import type { User } from "@/lib/api/schemas";
@@ -22,6 +23,7 @@ export function DashboardAside({
   checkedToday: boolean;
 }) {
   const [profileOpen, setProfileOpen] = useState(false);
+  const [handbookOpen, setHandbookOpen] = useState(false);
   const [, startLogout] = useTransition();
   const queryClient = useQueryClient();
   const level = levelFromExp(user.exp);
@@ -94,8 +96,8 @@ export function DashboardAside({
         <div className="relative z-10 flex w-full gap-2">
           <button
             type="button"
-            disabled
-            className="flex h-11 flex-1 items-center justify-center gap-1 rounded-[14px] border-[1.5px] border-palette-green-light/50 bg-gradient-to-br from-palette-green-mist to-palette-green-lighter text-sm font-extrabold text-brand-dark shadow-[0_4px_8px_color-mix(in_oklch,var(--color-border-muted)_15%,transparent)] transition-transform disabled:cursor-not-allowed disabled:opacity-70"
+            onClick={() => setHandbookOpen(true)}
+            className="flex h-11 flex-1 items-center justify-center gap-1 rounded-[14px] border-[1.5px] border-palette-green-light/50 bg-gradient-to-br from-palette-green-mist to-palette-green-lighter text-sm font-extrabold text-brand-dark shadow-[0_4px_8px_color-mix(in_oklch,var(--color-border-muted)_15%,transparent)] transition-transform hover:-translate-y-0.5"
           >
             <BookOpen className="size-4" strokeWidth={2.5} /> 新手图鉴
           </button>
@@ -103,15 +105,14 @@ export function DashboardAside({
             alreadyCheckedToday={checkedToday}
             className="flex-1"
           />
-          <form action={handleLogout}>
-            <button
-              type="submit"
-              title="登出账号"
-              className="flex size-11 shrink-0 items-center justify-center rounded-[14px] bg-canvas text-destructive shadow-[var(--shadow-soft)] transition-transform hover:-translate-y-0.5"
-            >
-              <LogOut className="size-[18px]" strokeWidth={2.5} />
-            </button>
-          </form>
+          <button
+            type="button"
+            onClick={handleLogout}
+            title="登出账号"
+            className="flex size-11 shrink-0 items-center justify-center rounded-[14px] bg-canvas text-destructive shadow-[var(--shadow-soft)] transition-transform hover:-translate-y-0.5"
+          >
+            <LogOut className="size-[18px]" strokeWidth={2.5} />
+          </button>
         </div>
       </div>
 
@@ -122,6 +123,7 @@ export function DashboardAside({
         open={profileOpen}
         onOpenChange={setProfileOpen}
       />
+      <HandbookDialog open={handbookOpen} onOpenChange={setHandbookOpen} />
     </div>
   );
 }

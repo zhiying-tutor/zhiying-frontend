@@ -95,5 +95,6 @@ export async function completeTaskAction(
       body: {},
     });
     revalidatePath(`/tasks/${taskId}`);
+    revalidatePath("/dashboard");
   });
 }

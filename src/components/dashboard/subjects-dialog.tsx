@@ -94,9 +94,9 @@ export function SubjectsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[85vh] gap-4 sm:max-w-[560px]">
         <DialogHeader>
-          <DialogTitle>我的学习计划</DialogTitle>
+          <DialogTitle>我的学习主题</DialogTitle>
           <DialogDescription>
-            选择一个计划聚焦学习，或创建一个新计划
+            选择一个主题聚焦学习，或创建一个新主题
           </DialogDescription>
         </DialogHeader>
         <div className="flex items-center gap-2">

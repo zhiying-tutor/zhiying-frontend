@@ -2,7 +2,6 @@
 
 import {
   AlertTriangle,
-  PartyPopper,
   Sparkles,
   PlayCircle,
 } from "lucide-react";
@@ -81,17 +80,6 @@ export function PretestReadyCard({ subject }: { subject: StudySubject }) {
           去答题
         </Link>
       }
-    />
-  );
-}
-
-export function FinishedCard({ subject }: { subject: StudySubject }) {
-  return (
-    <StateCard
-      tone="success"
-      icon={<PartyPopper className="size-10 text-palette-orange" />}
-      title="计划已完成"
-      description={`你已经完成「${subject.subject}」的全部 ${subject.total_stages} 个阶段，去开启下一个吧。`}
     />
   );
 }

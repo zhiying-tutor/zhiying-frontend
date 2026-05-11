@@ -69,7 +69,7 @@ export function PlanToolbar({
             onClick={() => setOpen(true)}
           >
             <Repeat className="size-4" />
-            切换计划
+            切换主题
           </Button>
         </div>
       </Card>

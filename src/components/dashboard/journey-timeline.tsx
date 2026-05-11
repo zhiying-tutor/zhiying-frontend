@@ -22,19 +22,27 @@ export function JourneyTimeline({ subject }: { subject: StudySubject }) {
       ? Math.round((subject.finished_stages / subject.total_stages) * 100)
       : 0;
   const stagesQuery = useSubjectStages(subject.id);
+  const finished = subject.status === "FINISHED";
 
   return (
     <Card className="flex flex-col gap-6 rounded-3xl border border-border/30 bg-white/70 p-6 shadow-[var(--shadow-soft)] backdrop-blur-sm">
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-4">
-          <h3 className="text-lg font-bold text-brand-dark">学习中</h3>
+          <h3 className="text-lg font-bold text-brand-dark">
+            {finished ? "已完成" : "学习中"}
+          </h3>
           <span className="text-sm font-bold text-brand-medium">
             Day {subject.finished_stages}/{subject.total_stages}
           </span>
         </div>
         <div className="h-2 w-full overflow-hidden rounded-full bg-border/15">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-palette-orange to-palette-yellow transition-[width] duration-500"
+            className={cn(
+              "h-full rounded-full transition-[width] duration-500",
+              finished
+                ? "bg-gradient-to-r from-palette-green to-palette-green-light"
+                : "bg-gradient-to-r from-palette-orange to-palette-yellow",
+            )}
             style={{ width: `${overallProgress}%` }}
           />
         </div>

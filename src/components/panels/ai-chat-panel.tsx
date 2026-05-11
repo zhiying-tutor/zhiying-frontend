@@ -15,7 +15,7 @@ export function AiChatPanel() {
           <div className="max-w-[85%] rounded-2xl rounded-bl-sm bg-palette-orange-lighter px-4 py-3 text-sm font-medium leading-relaxed text-brand-deep">
             嗨呀！欢迎来到智映通学 👋
             <br />
-            选择一个学习计划开始，或随时来问我问题。
+            选择一个学习主题开始，或随时来问我问题。
           </div>
         </div>
       </div>

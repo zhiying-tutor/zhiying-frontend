@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { AlertTriangle, ArrowRight, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -17,9 +17,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { useStudyTaskQuizzes } from "@/lib/query/study-quiz";
 import type { StudyTaskStatus } from "@/lib/api/schemas";
 
 import { ContentCard } from "./content-card";
+
+const CONSOLIDATION_THRESHOLD = 60;
 
 export function TaskCompleteCard({
   taskId,
@@ -36,7 +39,16 @@ export function TaskCompleteCard({
   const finished = taskStatus === "FINISHED";
   const locked = taskStatus === "LOCKED";
 
-  const onConfirm = () => {
+  const { data: quizzes = [] } = useStudyTaskQuizzes(taskId);
+  const submittedScores = quizzes
+    .filter((q) => q.status === "SUBMITTED" && q.total_problems > 0)
+    .map((q) => Math.round((q.correct_problems / q.total_problems) * 100));
+  const hasSubmittedQuiz = submittedScores.length > 0;
+  const bestScore = hasSubmittedQuiz ? Math.max(...submittedScores) : 0;
+  const needConsolidation =
+    !finished && !locked && bestScore < CONSOLIDATION_THRESHOLD;
+
+  const onConfirmComplete = () => {
     startTransition(async () => {
       const result = await completeTaskAction(taskId);
       if (result.ok) {
@@ -104,21 +116,57 @@ export function TaskCompleteCard({
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>完成本任务?</AlertDialogTitle>
+            <AlertDialogTitle>
+              {needConsolidation ? "建议先巩固一下" : "完成本任务?"}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              完成后将解锁下一任务，无法撤回。
+              {needConsolidation
+                ? hasSubmittedQuiz
+                  ? `你的小测最高分仅为 ${bestScore} 分，建议再做一次测验或回看资料巩固掌握度，再标记完成。`
+                  : "你还没有完成过本任务的小测。建议先做一次测验检验掌握度，再标记完成。"
+                : "完成后将解锁下一任务，无法撤回。"}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isPending}>取消</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={onConfirm}
-              disabled={isPending}
-              className="bg-gradient-to-br from-palette-yellow to-palette-orange font-bold text-brand-dark hover:opacity-90"
-            >
-              {isPending ? "处理中…" : "确认完成"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
+          {needConsolidation ? (
+            <div className="flex items-start gap-2 rounded-2xl border border-palette-orange/30 bg-palette-orange-lighter/40 px-3 py-2 text-xs font-semibold text-brand-dark">
+              <AlertTriangle
+                className="mt-0.5 size-4 shrink-0 stroke-palette-orange"
+                strokeWidth={2.4}
+              />
+              <span>
+                标记完成后将解锁下一任务且无法撤回。强制完成可能影响后续学习效果。
+              </span>
+            </div>
+          ) : null}
+          {needConsolidation ? (
+            <AlertDialogFooter>
+              <AlertDialogAction
+                onClick={onConfirmComplete}
+                disabled={isPending}
+                variant="outline"
+                className="text-destructive hover:bg-destructive/5 hover:text-destructive"
+              >
+                {isPending ? "处理中…" : "仍要强制完成"}
+              </AlertDialogAction>
+              <AlertDialogCancel
+                disabled={isPending}
+                className="bg-gradient-to-br from-palette-yellow to-palette-orange font-bold text-brand-dark hover:opacity-90"
+              >
+                继续巩固
+              </AlertDialogCancel>
+            </AlertDialogFooter>
+          ) : (
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={isPending}>取消</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={onConfirmComplete}
+                disabled={isPending}
+                className="bg-gradient-to-br from-palette-yellow to-palette-orange font-bold text-brand-dark hover:opacity-90"
+              >
+                {isPending ? "处理中…" : "确认完成"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          )}
         </AlertDialogContent>
       </AlertDialog>
     </ContentCard>

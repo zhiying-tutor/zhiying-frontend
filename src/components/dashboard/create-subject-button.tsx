@@ -49,7 +49,7 @@ export function CreateSubjectButton({
   currentDiamond,
   variant = "primary",
   className,
-  label = "创建第一个学习计划",
+  label = "创建第一个学习主题",
 }: CreateSubjectButtonProps) {
   const [open, setOpen] = useState(false);
 
@@ -172,7 +172,7 @@ function CreateSubjectModal({
               </div>
 
               <div className="flex flex-col gap-2">
-                <span className="text-sm font-bold text-brand-dark">目标语言</span>
+                <span className="text-sm font-bold text-brand-dark">编程语言</span>
                 <div className="flex flex-wrap gap-2">
                   {LANGUAGE_OPTIONS.map((opt) => {
                     const active = language === opt.value;
@@ -211,7 +211,7 @@ function CreateSubjectModal({
                         }`}
                       >
                         <span className="text-base font-black text-brand-dark">
-                          {p.total_stages} 阶段
+                          {p.total_stages} 天
                         </span>
                         <span className="inline-flex items-center gap-1 text-sm font-bold text-palette-blue">
                           <Gem className="size-3.5" strokeWidth={2.2} />
@@ -258,10 +258,10 @@ function CreateSubjectModal({
                 <Gem className="size-8" strokeWidth={1.8} />
               </div>
               <DialogTitle className="text-lg font-extrabold text-brand-dark">
-                确认开启学习计划？
+                确认创建学习主题？
               </DialogTitle>
               <DialogDescription className="text-sm text-brand-medium">
-                «{subject.trim()}» · {totalStages} 阶段
+                «{subject.trim()}» · {totalStages} 天
               </DialogDescription>
             </DialogHeader>
 
@@ -311,7 +311,7 @@ function CreateSubjectModal({
                 ) : (
                   <>
                     <Gem className="size-4" strokeWidth={2.2} />
-                    确认开启
+                    确认创建
                   </>
                 )}
               </Button>

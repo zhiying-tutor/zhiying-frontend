@@ -139,12 +139,20 @@ export const resourceConfigSchema = z.object({
 });
 export type ResourceConfig = z.infer<typeof resourceConfigSchema>;
 
+export const checkinConfigSchema = z.object({
+  reward_sequence: z.array(z.number().int()),
+  makeup_gold_cost_per_day: z.number().int(),
+  makeup_diamond_cost: z.number().int(),
+});
+export type CheckinConfig = z.infer<typeof checkinConfigSchema>;
+
 export const publicConfigSchema = z.object({
   study_subject: z.object({
     pricing: z.array(studySubjectPricingItemSchema),
   }),
   storage: storageConfigSchema,
   resource: resourceConfigSchema,
+  checkin: checkinConfigSchema,
 });
 export type PublicConfig = z.infer<typeof publicConfigSchema>;
 

@@ -96,20 +96,20 @@ function EmptyState({
   currentDiamond: number;
 }) {
   return (
-    <div className="mx-auto flex max-w-[680px] flex-col items-center rounded-[28px] border-2 border-dashed border-border/25 bg-white/60 px-10 py-16 text-center shadow-[var(--shadow-soft)]">
+    <div className="flex w-full flex-col items-center rounded-[28px] border-2 border-dashed border-border/25 bg-white/60 px-10 py-16 text-center shadow-[var(--shadow-soft)]">
       <div className="mb-6 flex size-20 items-center justify-center rounded-full bg-gradient-to-br from-palette-yellow-light to-palette-orange-light text-palette-orange shadow-[0_4px_12px_color-mix(in_oklch,var(--palette-orange)_30%,transparent)]">
         <Rocket className="size-10" strokeWidth={1.6} />
       </div>
       <h2 className="mb-3 text-2xl font-extrabold text-brand-dark">
-        还没有学习计划
+        还没有学习主题
       </h2>
       <p className="mb-8 max-w-[400px] text-[15px] leading-relaxed text-brand-medium">
-        创建你的第一个个性化学习计划，AI 将为你量身定制学习路线、知识点和每日任务
+        创建你的第一个个性化学习主题，AI 将为你量身定制学习路线、知识点和每日任务
       </p>
       <CreateSubjectButton
         pricing={pricing}
         currentDiamond={currentDiamond}
-        label="创建第一个学习计划"
+        label="创建第一个学习主题"
       />
     </div>
   );
